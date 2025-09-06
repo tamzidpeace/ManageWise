@@ -53,13 +53,13 @@ This document outlines a week-by-week development plan for building the Inventor
 - [x] Create authentication middleware
   - Create middleware to protect API routes
   - Implement role-based access control functions
-- [ ] Build login/register UI pages
+- [x] Build login/register UI pages
   - Create login page with form
   - Create registration page with form
   - Implement form validation
   - Add client-side error handling
   - Connect forms to API endpoints
-- [ ] Test authentication flows
+- [x] Test authentication flows
   - Test user registration flow
   - Test user login flow
   - Test protected route access
@@ -73,7 +73,7 @@ This document outlines a week-by-week development plan for building the Inventor
 - Set up product database schema
 
 ### Tasks:
-- [ ] Design product database schema
+- [x] Design product database schema
   - Define product model with fields: name, category, brand, price, stock, description, image
   - Implement Mongoose schema validation
   - Add timestamps for createdAt/updatedAt

@@ -3,29 +3,28 @@ import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import { comparePasswords } from '@/utils/password';
 import jwt from 'jsonwebtoken';
+import { UserLoginSchema } from '@/schemas';
 
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
     
-    const { email, password } = await request.json();
+    const body = await request.json();
     
-    // Validate required fields
-    if (!email || !password) {
+    // Validate request body with Zod
+    const validation = UserLoginSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { success: false, message: 'Email and password are required' },
+        { 
+          success: false, 
+          message: 'Validation error',
+          errors: validation.error.flatten()
+        },
         { status: 400 }
       );
     }
     
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid email format' },
-        { status: 400 }
-      );
-    }
+    const { email, password } = validation.data;
     
     // Find user by email
     const user = await User.findOne({ email });

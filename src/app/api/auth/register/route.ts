@@ -2,37 +2,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import { hashPassword } from '@/utils/password';
+import { UserRegistrationSchema } from '@/schemas';
 
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
     
-    const { name, email, password, role } = await request.json();
+    const body = await request.json();
     
-    // Validate required fields
-    if (!name || !email || !password) {
+    // Validate request body with Zod
+    const validation = UserRegistrationSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { success: false, message: 'Name, email, and password are required' },
+        { 
+          success: false, 
+          message: 'Validation error',
+          errors: validation.error.flatten()
+        },
         { status: 400 }
       );
     }
     
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid email format' },
-        { status: 400 }
-      );
-    }
-    
-    // Validate password strength (at least 6 characters)
-    if (password.length < 6) {
-      return NextResponse.json(
-        { success: false, message: 'Password must be at least 6 characters long' },
-        { status: 400 }
-      );
-    }
+    const { name, email, password, role } = validation.data;
     
     // Check if user already exists
     const existingUser = await User.findOne({ email });
