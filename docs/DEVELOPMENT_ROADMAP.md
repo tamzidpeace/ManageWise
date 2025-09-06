@@ -11,37 +11,37 @@ This document outlines a week-by-week development plan for building the Inventor
 - Create user database schema
 
 ### Tasks:
-- [ ] Initialize Next.js project with TypeScript
+- [x] Initialize Next.js project with TypeScript
   - Run `npx create-next-app@latest` with TypeScript options
   - Configure tsconfig.json for strict mode
   - Set up ESLint and Prettier for code formatting
-- [ ] Set up project directory structure
+- [x] Set up project directory structure
   - Create directories for components, pages, lib, styles, etc.
-  - Set up CSS framework (Tailwind CSS or Bootstrap)
-- [ ] Set up MongoDB connection with Mongoose
-  - Create MongoDB Atlas account
+  - Set up CSS framework (Tailwind CSS)
+- [x] Set up MongoDB connection with Mongoose
+  - connect with local mongodb community edition
   - Install mongoose package
   - Create database connection utility
   - Test database connectivity
-- [ ] Configure environment variables
+- [x] Configure environment variables
   - Create .env.local file
   - Set up MongoDB connection string
   - Configure JWT secret (if using JWT)
   - Add environment variables to .gitignore
-- [ ] Create basic user database schema
+- [x] Create basic user database schema
   - Define user model with fields: name, email, passwordHash, role
   - Implement Mongoose schema validation
   - Create model export for use in API routes
-- [ ] Implement password hashing with bcrypt
+- [x] Implement password hashing with bcrypt
   - Install bcryptjs and @types/bcryptjs
   - Create utility functions for hashing and comparing passwords
-- [ ] Implement user registration API endpoint
+- [x] Implement user registration API endpoint
   - Create /api/auth/register route
   - Implement input validation
   - Check for existing users
   - Hash password and save user
   - Return success/error response
-- [ ] Implement user login API endpoint
+- [x] Implement user login API endpoint
   - Create /api/auth/login route
   - Validate user credentials
   - Generate JWT token or session (if using NextAuth.js)

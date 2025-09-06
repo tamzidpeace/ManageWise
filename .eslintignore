@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+out/
+
+# Logs
+*.log
+
+# Environment files
+.env*
+
+# Ignore docs for now
+docs/
