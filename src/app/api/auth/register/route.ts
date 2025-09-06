@@ -3,6 +3,7 @@ import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import { hashPassword } from '@/utils/password';
 import { UserRegistrationSchema } from '@/schemas';
+import { handleZodError } from '@/utils/validation';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,14 +14,7 @@ export async function POST(request: NextRequest) {
     // Validate request body with Zod
     const validation = UserRegistrationSchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          message: 'Validation error',
-          errors: validation.error.flatten()
-        },
-        { status: 400 }
-      );
+      return handleZodError(validation.error);
     }
     
     const { name, email, password, role } = validation.data;

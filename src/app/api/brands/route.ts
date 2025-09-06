@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Brand from '@/models/Brand';
 import { withRole } from '@/lib/authMiddleware';
+import { BrandCreateSchema } from '@/schemas';
+import { handleZodError } from '@/utils/validation';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,15 +17,15 @@ export async function POST(request: NextRequest) {
     
     await dbConnect();
     
-    const { name, description } = await request.json();
+    const body = await request.json();
     
-    // Validate required fields
-    if (!name) {
-      return NextResponse.json(
-        { success: false, message: 'Name is required' },
-        { status: 400 }
-      );
+    // Validate request body with Zod
+    const validation = BrandCreateSchema.safeParse(body);
+    if (!validation.success) {
+      return handleZodError(validation.error);
     }
+    
+    const { name, description } = validation.data;
     
     // Check if brand already exists
     const existingBrand = await Brand.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });

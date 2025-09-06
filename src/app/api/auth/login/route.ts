@@ -4,6 +4,7 @@ import User from '@/models/User';
 import { comparePasswords } from '@/utils/password';
 import jwt from 'jsonwebtoken';
 import { UserLoginSchema } from '@/schemas';
+import { handleZodError } from '@/utils/validation';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,14 +15,7 @@ export async function POST(request: NextRequest) {
     // Validate request body with Zod
     const validation = UserLoginSchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          message: 'Validation error',
-          errors: validation.error.flatten()
-        },
-        { status: 400 }
-      );
+      return handleZodError(validation.error);
     }
     
     const { email, password } = validation.data;

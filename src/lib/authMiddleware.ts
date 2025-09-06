@@ -19,17 +19,7 @@ export async function withAuth(request: NextRequest) {
     );
   }
   
-  // Add user info to request headers for use in route handlers
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-user-id', decoded.userId);
-  requestHeaders.set('x-user-role', decoded.role);
-  
-  // Create a new request with the updated headers
-  const newRequest = new NextRequest(request, {
-    headers: requestHeaders,
-  });
-  
-  return { request: newRequest, user: decoded };
+  return { user: decoded };
 }
 
 export async function withRole(request: NextRequest, allowedRoles: string[]) {

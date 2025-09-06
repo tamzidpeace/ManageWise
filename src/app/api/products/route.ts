@@ -4,6 +4,8 @@ import Product from '@/models/Product';
 import Category from '@/models/Category';
 import Brand from '@/models/Brand';
 import { withRole } from '@/lib/authMiddleware';
+import { ProductCreateSchema } from '@/schemas';
+import { handleZodError } from '@/utils/validation';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,23 +19,15 @@ export async function POST(request: NextRequest) {
     
     await dbConnect();
     
-    const { name, categoryId, brandId, price, stock, description, image } = await request.json();
+    const body = await request.json();
     
-    // Validate required fields
-    if (!name || !categoryId || !price || !stock) {
-      return NextResponse.json(
-        { success: false, message: 'Name, category, price, and stock are required' },
-        { status: 400 }
-      );
+    // Validate request body with Zod
+    const validation = ProductCreateSchema.safeParse(body);
+    if (!validation.success) {
+      return handleZodError(validation.error);
     }
     
-    // Validate price and stock
-    if (price < 0 || stock < 0) {
-      return NextResponse.json(
-        { success: false, message: 'Price and stock must be non-negative numbers' },
-        { status: 400 }
-      );
-    }
+    const { name, categoryId, brandId, price, stock, description, image } = validation.data;
     
     // Check if category exists
     const category = await Category.findById(categoryId);

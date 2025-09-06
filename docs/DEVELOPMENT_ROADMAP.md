@@ -64,6 +64,9 @@ This document outlines a week-by-week development plan for building the Inventor
   - Test user login flow
   - Test protected route access
   - Verify role-based access control
+- [ ] Create two layout. for auth user and not auth user.
+  - if user is logged in then he will redirect to authenticated layout. and cannot access non auth layout and vise versa.
+  - in the authenticated layout, create a responsive sidebar for menus and sub-menus. and header also.
 
 ## Week 2: Core Product Management
 
