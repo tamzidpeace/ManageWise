@@ -45,12 +45,12 @@ This document outlines a week-by-week development plan for building the Inventor
   - Create /api/auth/login route
   - Validate user credentials
   - Generate JWT token or session (if using NextAuth.js)
-- [ ] Set up NextAuth.js or JWT-based authentication
+- [x] Set up NextAuth.js or JWT-based authentication
   - Choose authentication method (NextAuth.js recommended for Next.js)
   - Configure authentication providers
   - Set up session management
   - Implement protected route middleware
-- [ ] Create authentication middleware
+- [x] Create authentication middleware
   - Create middleware to protect API routes
   - Implement role-based access control functions
 - [ ] Build login/register UI pages
