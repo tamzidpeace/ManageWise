@@ -4,20 +4,30 @@ import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import {
-  FiHome,
-  FiPackage,
-  FiList,
-  FiAward,
-  FiShoppingCart,
-  FiUsers,
-  FiBarChart2,
+import { 
+  FiHome, 
+  FiPackage, 
+  FiList, 
+  FiAward, 
+  FiShoppingCart, 
+  FiUsers, 
+  FiBarChart2, 
   FiLogOut,
   FiChevronLeft,
   FiChevronRight,
   FiChevronDown,
-  FiChevronUp,
+  FiChevronUp
 } from 'react-icons/fi';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 export default function Sidebar() {
   const { logout, user } = useAuthStore();
@@ -25,6 +35,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
   // Load sidebar state from localStorage on component mount
   useEffect(() => {
@@ -32,14 +43,11 @@ export default function Sidebar() {
     if (savedCollapsedState) {
       setIsSidebarCollapsed(JSON.parse(savedCollapsedState));
     }
-
+    
     // Initialize open menus based on current path
     const initialOpenMenus: Record<string, boolean> = {};
-    menuItems.forEach((item) => {
-      if (
-        item.subItems &&
-        item.subItems.some((subItem) => pathname?.startsWith(subItem.href))
-      ) {
+    menuItems.forEach(item => {
+      if (item.subItems && item.subItems.some(subItem => pathname?.startsWith(subItem.href))) {
         initialOpenMenus[item.name] = true;
       }
     });
@@ -48,10 +56,7 @@ export default function Sidebar() {
 
   // Save sidebar state to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem(
-      'sidebarCollapsed',
-      JSON.stringify(isSidebarCollapsed)
-    );
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(isSidebarCollapsed));
   }, [isSidebarCollapsed]);
 
   const handleLogout = async () => {
@@ -77,7 +82,13 @@ export default function Sidebar() {
       // Even if the API call fails, clear the local state and redirect
       logout();
       router.push('/login');
+    } finally {
+      setIsLogoutDialogOpen(false);
     }
+  };
+
+  const handleLogoutClick = () => {
+    setIsLogoutDialogOpen(true);
   };
 
   const toggleSidebar = () => {
@@ -85,9 +96,9 @@ export default function Sidebar() {
   };
 
   const toggleMenu = (menuName: string) => {
-    setOpenMenus((prev) => ({
+    setOpenMenus(prev => ({
       ...prev,
-      [menuName]: !prev[menuName],
+      [menuName]: !prev[menuName]
     }));
   };
 
@@ -97,7 +108,7 @@ export default function Sidebar() {
       name: 'Dashboard',
       href: '/',
       icon: FiHome,
-      subItems: [],
+      subItems: []
     },
     {
       name: 'Products',
@@ -105,20 +116,20 @@ export default function Sidebar() {
       icon: FiPackage,
       subItems: [
         { name: 'All Products', href: '/products' },
-        { name: 'Add Product', href: '/products/new' },
-      ],
+        { name: 'Add Product', href: '/products/new' }
+      ]
     },
     {
       name: 'Categories',
       href: '/categories',
       icon: FiList,
-      subItems: [],
+      subItems: []
     },
     {
       name: 'Brands',
       href: '/brands',
       icon: FiAward,
-      subItems: [],
+      subItems: []
     },
     {
       name: 'Orders',
@@ -126,14 +137,14 @@ export default function Sidebar() {
       icon: FiShoppingCart,
       subItems: [
         { name: 'All Orders', href: '/orders' },
-        { name: 'Create Order', href: '/orders/new' },
-      ],
+        { name: 'Create Order', href: '/orders/new' }
+      ]
     },
     {
       name: 'Users',
       href: '/users',
       icon: FiUsers,
-      subItems: [],
+      subItems: []
     },
     {
       name: 'Reports',
@@ -141,9 +152,9 @@ export default function Sidebar() {
       icon: FiBarChart2,
       subItems: [
         { name: 'Sales Report', href: '/reports/sales' },
-        { name: 'Inventory Report', href: '/reports/inventory' },
-      ],
-    },
+        { name: 'Inventory Report', href: '/reports/inventory' }
+      ]
+    }
   ];
 
   // Get the appropriate menu item based on user role
@@ -152,8 +163,9 @@ export default function Sidebar() {
       return menuItems;
     } else if (user?.role === 'cashier') {
       // Filter out admin-only items for cashier
-      return menuItems.filter(
-        (item) => item.name !== 'Users' && item.name !== 'Reports'
+      return menuItems.filter(item => 
+        item.name !== 'Users' && 
+        item.name !== 'Reports'
       );
     }
     return [];
@@ -162,90 +174,79 @@ export default function Sidebar() {
   const filteredMenuItems = getFilteredMenuItems();
 
   return (
-    <div
-      className={`min-h-screen bg-gray-800 text-white transition-all duration-300 ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}
-    >
-      {/* Sidebar Header */}
-      <div className="flex items-center justify-between border-b border-gray-700 p-4">
-        {!isSidebarCollapsed && (
-          <h1 className="text-xl font-bold">Inventory POS</h1>
-        )}
-        <button
-          onClick={toggleSidebar}
-          className="rounded-md p-2 transition-colors hover:bg-gray-700"
-          aria-label={
-            isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
-          }
-        >
-          {isSidebarCollapsed ? (
-            <FiChevronRight size={20} />
-          ) : (
-            <FiChevronLeft size={20} />
-          )}
-        </button>
-      </div>
-
-      {/* Navigation */}
-      <nav className="relative mt-4 h-[calc(100vh-80px)] overflow-y-auto">
-        <ul>
-          {filteredMenuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              pathname === item.href ||
-              (item.href !== '/' && pathname?.startsWith(item.href));
-            const isMenuOpen = openMenus[item.name];
-
-            return (
-              <li key={item.name}>
-                {/* Main menu item */}
-                <Link
-                  href={item.href}
-                  className={`flex items-center px-4 py-3 transition-colors hover:bg-gray-700 ${
-                    isActive ? 'border-l-4 border-indigo-500 bg-gray-900' : ''
-                  }`}
-                  onClick={(e) => {
-                    if (item.subItems && item.subItems.length > 0) {
-                      e.preventDefault();
-                      toggleMenu(item.name);
-                    }
-                  }}
-                >
-                  <Icon size={20} className="flex-shrink-0" />
-                  {!isSidebarCollapsed && (
-                    <>
-                      <span className="ml-3">{item.name}</span>
-                      {item.subItems && item.subItems.length > 0 && (
-                        <span className="ml-auto">
-                          {isMenuOpen ? (
-                            <FiChevronUp size={16} />
-                          ) : (
-                            <FiChevronDown size={16} />
-                          )}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </Link>
-
-                {/* Sub-menu items */}
-                {!isSidebarCollapsed &&
-                  item.subItems &&
-                  item.subItems.length > 0 && (
-                    <div
-                      className={`overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-96' : 'max-h-0'}`}
-                    >
-                      <ul className="py-2 pl-12">
+    <>
+      <div className={cn(
+        "min-h-screen bg-gray-800 text-white transition-all duration-300",
+        isSidebarCollapsed ? "w-20" : "w-64"
+      )}>
+        {/* Sidebar Header */}
+        <div className="border-b border-gray-700 p-4 flex items-center justify-between">
+          {!isSidebarCollapsed && <h1 className="text-xl font-bold">Inventory POS</h1>}
+          <button 
+            onClick={toggleSidebar}
+            className="p-2 rounded-md hover:bg-gray-700 transition-colors"
+            aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isSidebarCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
+          </button>
+        </div>
+        
+        {/* Navigation */}
+        <nav className="mt-4">
+          <ul>
+            {filteredMenuItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
+              const isMenuOpen = openMenus[item.name];
+              
+              return (
+                <li key={item.name}>
+                  {/* Main menu item */}
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "flex items-center px-4 py-3 transition-colors hover:bg-gray-700",
+                      isActive ? "bg-gray-900 border-l-4 border-indigo-500" : ""
+                    )}
+                    onClick={(e) => {
+                      if (item.subItems && item.subItems.length > 0) {
+                        e.preventDefault();
+                        toggleMenu(item.name);
+                      }
+                    }}
+                  >
+                    <Icon size={20} className="flex-shrink-0" />
+                    {!isSidebarCollapsed && (
+                      <>
+                        <span className="ml-3">{item.name}</span>
+                        {item.subItems && item.subItems.length > 0 && (
+                          <span className="ml-auto">
+                            {isMenuOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </Link>
+                  
+                  {/* Sub-menu items */}
+                  {!isSidebarCollapsed && item.subItems && item.subItems.length > 0 && (
+                    <div className={cn(
+                      "transition-all duration-300 overflow-hidden",
+                      isMenuOpen ? "max-h-96" : "max-h-0"
+                    )}>
+                      <ul className="pl-12 py-2">
                         {item.subItems.map((subItem) => {
                           const isSubActive = pathname === subItem.href;
                           return (
                             <li key={subItem.name} className="mb-1">
                               <Link
                                 href={subItem.href}
-                                className={`block rounded-md px-4 py-2 transition-colors ${
-                                  isSubActive
-                                    ? 'bg-gray-900 text-indigo-300'
-                                    : 'hover:bg-gray-700'
-                                }`}
+                                className={cn(
+                                  "block px-4 py-2 rounded-md transition-colors",
+                                  isSubActive 
+                                    ? "bg-gray-900 text-indigo-300" 
+                                    : "hover:bg-gray-700"
+                                )}
                               >
                                 {subItem.name}
                               </Link>
@@ -255,26 +256,49 @@ export default function Sidebar() {
                       </ul>
                     </div>
                   )}
-              </li>
-            );
-          })}
-        </ul>
-
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+        
         {/* Logout button */}
-        <div
-          className={`absolute bottom-0 w-full border-t border-gray-700 p-4 ${isSidebarCollapsed ? 'text-center' : ''}`}
-        >
+        <div className={cn(
+          "absolute bottom-0 w-full border-t border-gray-700 p-4",
+          isSidebarCollapsed ? "text-center" : ""
+        )}>
           <button
-            onClick={handleLogout}
-            className={`flex w-full items-center justify-center rounded-md bg-red-600 px-4 py-2 transition-colors hover:bg-red-700 ${
-              isSidebarCollapsed ? 'px-2 py-3' : ''
-            }`}
+            onClick={handleLogoutClick}
+            className={cn(
+              "flex items-center justify-center w-full rounded-md bg-red-600 px-4 py-2 transition-colors hover:bg-red-700",
+              isSidebarCollapsed ? "px-2 py-3" : ""
+            )}
           >
             <FiLogOut size={20} />
             {!isSidebarCollapsed && <span className="ml-3">Logout</span>}
           </button>
         </div>
-      </nav>
-    </div>
+      </div>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Logout</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to logout? You will need to sign in again to access the application.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsLogoutDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleLogout}>
+              Logout
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
