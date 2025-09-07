@@ -4,25 +4,28 @@ import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-export default function Home() {
+export default function PublicLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { isAuthenticated, user } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
+    // If user is authenticated, redirect to appropriate dashboard
     if (isAuthenticated && user) {
-      // Redirect to appropriate dashboard based on role
       if (user.role === 'admin') {
         router.push('/admin/dashboard');
       } else {
         router.push('/cashier/dashboard');
       }
-    } else {
-      // Redirect to login page if not authenticated
-      router.push('/login');
     }
   }, [isAuthenticated, user, router]);
 
   return (
-   <div>Loading</div>
+    <div className="min-h-screen bg-gray-50">
+      {children}
+    </div>
   );
 }

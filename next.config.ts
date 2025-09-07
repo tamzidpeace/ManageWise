@@ -1,10 +1,9 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  webpack: (config) => {
-    config.resolve.alias['@'] = __dirname;
-    return config;
+  turbopack: {
+    resolveAlias: { '@': __dirname },
+    resolveExtensions: ['.ts', '.tsx', '.js', '.json'],
   },
 };
 
