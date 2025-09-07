@@ -5,9 +5,8 @@ import { verifyToken } from '@/utils/auth';
 // Define paths that don't require authentication
 const publicPaths = ['/login', '/register'];
 
-// Define paths for each role
-const adminPaths = ['/admin'];
-const cashierPaths = ['/cashier'];
+// Define protected paths
+const protectedPaths = ['/dashboard'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -37,20 +36,12 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
     
-    // Check if user is trying to access admin paths
-    const isAdminPath = adminPaths.some(path => pathname.startsWith(path));
-    if (isAdminPath && payload.role !== 'admin') {
-      // Redirect to appropriate dashboard
-      const redirectPath = payload.role === 'cashier' ? '/cashier/dashboard' : '/login';
-      return NextResponse.redirect(new URL(redirectPath, request.url));
-    }
-    
-    // Check if user is trying to access cashier paths
-    const isCashierPath = cashierPaths.some(path => pathname.startsWith(path));
-    if (isCashierPath && payload.role !== 'cashier') {
-      // Redirect to appropriate dashboard
-      const redirectPath = payload.role === 'admin' ? '/admin/dashboard' : '/login';
-      return NextResponse.redirect(new URL(redirectPath, request.url));
+    // Check if user is trying to access protected paths
+    const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
+    if (isProtectedPath) {
+      // For now, allow all authenticated users to access the dashboard
+      // We'll implement role-based content later
+      return NextResponse.next();
     }
     
     // If everything is fine, continue
@@ -64,8 +55,7 @@ export async function middleware(request: NextRequest) {
 // Configure which paths the middleware should run on
 export const config = {
   matcher: [
-    '/admin/:path*',
-    '/cashier/:path*',
+    '/dashboard/:path*',
     '/login',
     '/register',
   ],
