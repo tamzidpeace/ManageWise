@@ -17,13 +17,11 @@ export default function LayoutItems({
   }
 
   return (
-    <div>
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <div className="flex flex-1 flex-col">
-          <Header />
-          <main className="flex-1 bg-gray-50 p-6">{children}</main>
-        </div>
+    <div className="flex h-screen">
+      <Sidebar />
+      <div className="flex flex-1 flex-col">
+        <Header />
+        <main className="flex-1 bg-gray-50 p-6 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

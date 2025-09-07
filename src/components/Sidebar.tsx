@@ -4,19 +4,19 @@ import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { 
-  FiHome, 
-  FiPackage, 
-  FiList, 
-  FiAward, 
-  FiShoppingCart, 
-  FiUsers, 
-  FiBarChart2, 
+import {
+  FiHome,
+  FiPackage,
+  FiList,
+  FiAward,
+  FiShoppingCart,
+  FiUsers,
+  FiBarChart2,
   FiLogOut,
   FiChevronLeft,
   FiChevronRight,
   FiChevronDown,
-  FiChevronUp
+  FiChevronUp,
 } from 'react-icons/fi';
 import {
   Dialog,
@@ -43,11 +43,14 @@ export default function Sidebar() {
     if (savedCollapsedState) {
       setIsSidebarCollapsed(JSON.parse(savedCollapsedState));
     }
-    
+
     // Initialize open menus based on current path
     const initialOpenMenus: Record<string, boolean> = {};
-    menuItems.forEach(item => {
-      if (item.subItems && item.subItems.some(subItem => pathname?.startsWith(subItem.href))) {
+    menuItems.forEach((item) => {
+      if (
+        item.subItems &&
+        item.subItems.some((subItem) => pathname?.startsWith(subItem.href))
+      ) {
         initialOpenMenus[item.name] = true;
       }
     });
@@ -56,7 +59,10 @@ export default function Sidebar() {
 
   // Save sidebar state to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', JSON.stringify(isSidebarCollapsed));
+    localStorage.setItem(
+      'sidebarCollapsed',
+      JSON.stringify(isSidebarCollapsed)
+    );
   }, [isSidebarCollapsed]);
 
   const handleLogout = async () => {
@@ -96,9 +102,9 @@ export default function Sidebar() {
   };
 
   const toggleMenu = (menuName: string) => {
-    setOpenMenus(prev => ({
+    setOpenMenus((prev) => ({
       ...prev,
-      [menuName]: !prev[menuName]
+      [menuName]: !prev[menuName],
     }));
   };
 
@@ -108,7 +114,7 @@ export default function Sidebar() {
       name: 'Dashboard',
       href: '/',
       icon: FiHome,
-      subItems: []
+      subItems: [],
     },
     {
       name: 'Products',
@@ -116,20 +122,20 @@ export default function Sidebar() {
       icon: FiPackage,
       subItems: [
         { name: 'All Products', href: '/products' },
-        { name: 'Add Product', href: '/products/new' }
-      ]
+        { name: 'Add Product', href: '/products/new' },
+      ],
     },
     {
       name: 'Categories',
       href: '/categories',
       icon: FiList,
-      subItems: []
+      subItems: [],
     },
     {
       name: 'Brands',
       href: '/brands',
       icon: FiAward,
-      subItems: []
+      subItems: [],
     },
     {
       name: 'Orders',
@@ -137,14 +143,14 @@ export default function Sidebar() {
       icon: FiShoppingCart,
       subItems: [
         { name: 'All Orders', href: '/orders' },
-        { name: 'Create Order', href: '/orders/new' }
-      ]
+        { name: 'Create Order', href: '/orders/new' },
+      ],
     },
     {
       name: 'Users',
       href: '/users',
       icon: FiUsers,
-      subItems: []
+      subItems: [],
     },
     {
       name: 'Reports',
@@ -152,9 +158,9 @@ export default function Sidebar() {
       icon: FiBarChart2,
       subItems: [
         { name: 'Sales Report', href: '/reports/sales' },
-        { name: 'Inventory Report', href: '/reports/inventory' }
-      ]
-    }
+        { name: 'Inventory Report', href: '/reports/inventory' },
+      ],
+    },
   ];
 
   // Get the appropriate menu item based on user role
@@ -163,9 +169,8 @@ export default function Sidebar() {
       return menuItems;
     } else if (user?.role === 'cashier') {
       // Filter out admin-only items for cashier
-      return menuItems.filter(item => 
-        item.name !== 'Users' && 
-        item.name !== 'Reports'
+      return menuItems.filter(
+        (item) => item.name !== 'Users' && item.name !== 'Reports'
       );
     }
     return [];
@@ -176,7 +181,7 @@ export default function Sidebar() {
   return (
     <>
       <div className={cn(
-        "min-h-screen bg-gray-800 text-white transition-all duration-300",
+        "flex flex-col h-screen bg-gray-800 text-white transition-all duration-300",
         isSidebarCollapsed ? "w-20" : "w-64"
       )}>
         {/* Sidebar Header */}
@@ -192,7 +197,7 @@ export default function Sidebar() {
         </div>
         
         {/* Navigation */}
-        <nav className="mt-4">
+        <nav className="flex-1 overflow-y-auto mt-4">
           <ul>
             {filteredMenuItems.map((item) => {
               const Icon = item.icon;
@@ -264,7 +269,7 @@ export default function Sidebar() {
         
         {/* Logout button */}
         <div className={cn(
-          "absolute bottom-0 w-full border-t border-gray-700 p-4",
+          "border-t border-gray-700 p-4",
           isSidebarCollapsed ? "text-center" : ""
         )}>
           <button
@@ -286,11 +291,15 @@ export default function Sidebar() {
           <DialogHeader>
             <DialogTitle>Confirm Logout</DialogTitle>
             <DialogDescription>
-              Are you sure you want to logout? You will need to sign in again to access the application.
+              Are you sure you want to logout? You will need to sign in again to
+              access the application.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsLogoutDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsLogoutDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleLogout}>
