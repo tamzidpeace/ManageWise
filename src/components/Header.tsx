@@ -1,9 +1,32 @@
 'use client';
 
 import { useAuthStore } from '@/stores/authStore';
+import { useEffect, useState } from 'react';
 
 export default function Header() {
   const { user } = useAuthStore();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Listen for sidebar state changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedCollapsedState = localStorage.getItem('sidebarCollapsed');
+      if (savedCollapsedState) {
+        setIsSidebarCollapsed(JSON.parse(savedCollapsedState));
+      }
+    };
+
+    // Check initial state
+    handleStorageChange();
+
+    // Listen for changes
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   return (
     <header className="bg-white shadow">

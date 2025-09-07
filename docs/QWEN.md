@@ -12,6 +12,7 @@ This is a Next.js-based Point of Sale (POS) inventory management system with Mon
 - **Authentication**: JWT-based authentication with role-based access control
 - **State Management**: Zustand for client-side state
 - **Styling**: Tailwind CSS
+- **Frontend Libraries**: Shadcn UI
 - **Testing**: Custom test scripts with Node.js
 
 ### Project Structure

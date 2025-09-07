@@ -10,7 +10,7 @@ export default function LayoutItems({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
 
   if (!isAuthenticated) {
     return <div>{children}</div>;

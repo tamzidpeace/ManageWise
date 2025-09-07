@@ -75,6 +75,10 @@ This document outlines a week-by-week development plan for building the Inventor
   - add active state for selected menu
   - add sub-menus for each menu
   - add collapse/expand functionality for sub-menus
+  - use shadcn for ui components
+  - If user click on logout button, then a confirmation dialog will appear. After confirmation, the user will be logged out and redirected to the login page.
+  - If user click on cancel button, then the confirmation dialog will be closed.
+  - If user click on outside of the dialog, then the confirmation dialog will be closed.
 
 ## Week 2: Core Product Management
 
