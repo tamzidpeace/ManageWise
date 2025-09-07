@@ -69,7 +69,7 @@ This document outlines a week-by-week development plan for building the Inventor
 - [x] Create two layout. for auth user and not auth user.
   - if user is logged in then he will redirect to authenticated layout. and cannot access non auth layout and vise versa.
   - in the authenticated layout, create a responsive sidebar for menus and sub-menus. and header also.
-- [ ] Improve sidebar
+- [x] Improve sidebar
   - add toggle button to make sidebar make small and large. in small screens only show the icons of the menu. in large screen show icon and name of menu
   - add icon for each menu
   - add active state for selected menu
