@@ -10,7 +10,7 @@ export default function Header() {
       <div className="flex justify-between items-center px-6 py-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-800">
-            {user?.role === 'admin' ? 'Admin Dashboard' : 'Cashier Dashboard'}
+            Dashboard
           </h2>
         </div>
         <div className="flex items-center space-x-4">

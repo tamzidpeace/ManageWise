@@ -17,11 +17,7 @@ export default function RegisterPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (user.role === 'admin') {
-        router.push('/admin/dashboard');
-      } else {
-        router.push('/cashier/dashboard');
-      }
+      router.push('/dashboard');
     }
   }, [isAuthenticated, user, router]);
 
@@ -70,7 +66,9 @@ export default function RegisterPage() {
   // Don't render the form if the user is already authenticated
   if (isAuthenticated) {
     return (
-      <div>Loading</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      </div>
     );
   }
 

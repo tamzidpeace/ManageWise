@@ -15,11 +15,7 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (user.role === 'admin') {
-        router.push('/authenticated/admin/dashboard');
-      } else {
-        router.push('/cashier/dashboard');
-      }
+      router.push('/dashboard');
     }
   }, [isAuthenticated, user, router]);
 
@@ -51,12 +47,8 @@ export default function LoginPage() {
           data.token
         );
 
-        // Redirect to dashboard based on role
-        if (data.user.role === 'admin') {
-          router.push('/admin/dashboard');
-        } else {
-          router.push('/cashier/dashboard');
-        }
+        // Redirect to dashboard
+        router.push('/dashboard');
       } else {
         setError(data.message);
       }
@@ -70,7 +62,11 @@ export default function LoginPage() {
 
   // Don't render the form if the user is already authenticated
   if (isAuthenticated) {
-    return <div>Loading</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
 
   return (
@@ -78,7 +74,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your
+            Sign in to your account
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

@@ -10,12 +10,8 @@ export default function Home() {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Redirect to appropriate dashboard based on role
-      if (user.role === 'admin') {
-        router.push('/admin/dashboard');
-      } else {
-        router.push('/cashier/dashboard');
-      }
+      // Redirect to dashboard
+      router.push('/dashboard');
     } else {
       // Redirect to login page if not authenticated
       router.push('/login');
@@ -23,6 +19,8 @@ export default function Home() {
   }, [isAuthenticated, user, router]);
 
   return (
-   <div>Loading</div>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+    </div>
   );
 }

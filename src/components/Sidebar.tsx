@@ -60,7 +60,6 @@ export default function Sidebar({ role }: SidebarProps) {
     <div className="w-64 bg-gray-800 text-white min-h-screen">
       <div className="p-4 border-b border-gray-700">
         <h1 className="text-xl font-bold">Inventory POS</h1>
-        <p className="text-sm text-gray-400">{role === 'admin' ? 'Administrator' : 'Cashier'}</p>
       </div>
       <nav className="mt-4">
         <ul>
