@@ -5,12 +5,14 @@ This document outlines a week-by-week development plan for building the Inventor
 ## Week 1: Project Setup & Authentication
 
 ### Goals:
+
 - Set up the development environment
 - Initialize the Next.js project
 - Implement basic authentication system
 - Create user database schema
 
 ### Tasks:
+
 - [x] Initialize Next.js project with TypeScript
   - Run `npx create-next-app@latest` with TypeScript options
   - Configure tsconfig.json for strict mode
@@ -64,18 +66,26 @@ This document outlines a week-by-week development plan for building the Inventor
   - Test user login flow
   - Test protected route access
   - Verify role-based access control
-- [ ] Create two layout. for auth user and not auth user.
+- [x] Create two layout. for auth user and not auth user.
   - if user is logged in then he will redirect to authenticated layout. and cannot access non auth layout and vise versa.
   - in the authenticated layout, create a responsive sidebar for menus and sub-menus. and header also.
+- [ ] Improve sidebar
+  - add toggle button to make sidebar make small and large. in small screens only show the icons of the menu. in large screen show icon and name of menu
+  - add icon for each menu
+  - add active state for selected menu
+  - add sub-menus for each menu
+  - add collapse/expand functionality for sub-menus
 
 ## Week 2: Core Product Management
 
 ### Goals:
+
 - Implement product CRUD operations
 - Create product management UI
 - Set up product database schema
 
 ### Tasks:
+
 - [x] Design product database schema
   - Define product model with fields: name, category, brand, price, stock, description, image
   - Implement Mongoose schema validation
@@ -132,11 +142,13 @@ This document outlines a week-by-week development plan for building the Inventor
 ## Week 3: Stock Management & Order Processing
 
 ### Goals:
+
 - Implement stock tracking functionality
 - Create order processing system
 - Build cart functionality
 
 ### Tasks:
+
 - [ ] Add stock quantity field to product schema
   - Verify stock field exists in product model
   - Add validation for non-negative numbers
@@ -190,11 +202,13 @@ This document outlines a week-by-week development plan for building the Inventor
 ## Week 4: User Management & Role-Based Access
 
 ### Goals:
+
 - Implement user management for administrators
 - Create role-based access control system
 - Enhance authentication with role support
 
 ### Tasks:
+
 - [ ] Extend user schema with role field
   - Add role field with enum values (admin, cashier)
   - Set default role for new users
@@ -242,11 +256,13 @@ This document outlines a week-by-week development plan for building the Inventor
 ## Week 5: Reporting & Analytics
 
 ### Goals:
+
 - Implement sales reporting functionality
 - Create dashboard with key metrics
 - Add report export capabilities
 
 ### Tasks:
+
 - [ ] Design reporting aggregation logic
   - Define report data structure
   - Create aggregation pipelines for MongoDB
@@ -292,11 +308,13 @@ This document outlines a week-by-week development plan for building the Inventor
 ## Week 6: UI/UX Enhancements & Testing
 
 ### Goals:
+
 - Improve user interface and experience
 - Conduct comprehensive testing
 - Fix bugs and optimize performance
 
 ### Tasks:
+
 - [ ] Implement responsive design for all pages
   - Test on various screen sizes (mobile, tablet, desktop)
   - Adjust layouts for different viewports
@@ -340,11 +358,13 @@ This document outlines a week-by-week development plan for building the Inventor
 ## Week 7: Deployment & Documentation
 
 ### Goals:
+
 - Deploy the application to production
 - Create user documentation
 - Prepare for release
 
 ### Tasks:
+
 - [ ] Set up production MongoDB Atlas database
   - Create production database cluster
   - Configure database security and network access
@@ -391,11 +411,13 @@ This document outlines a week-by-week development plan for building the Inventor
 ## Week 8: Future Enhancements Planning
 
 ### Goals:
+
 - Plan future feature enhancements
 - Gather user feedback
 - Prepare for next development cycle
 
 ### Tasks:
+
 - [ ] Collect feedback from initial users
   - Create user feedback survey
   - Conduct interviews with key users
@@ -442,6 +464,7 @@ This document outlines a week-by-week development plan for building the Inventor
 ## Milestones
 
 ### MVP Release (End of Week 5):
+
 - User authentication and authorization
 - Product management (CRUD)
 - Stock tracking
@@ -449,6 +472,7 @@ This document outlines a week-by-week development plan for building the Inventor
 - Role-based access control
 
 ### Beta Release (End of Week 7):
+
 - Complete feature set as defined in SRS
 - Full reporting capabilities
 - Production deployment
@@ -457,6 +481,7 @@ This document outlines a week-by-week development plan for building the Inventor
 ## Success Criteria
 
 By following this roadmap, the Inventory & Sales Management System will:
+
 1. Provide a complete MVP within 5 weeks
 2. Deliver a production-ready application within 7 weeks
 3. Include comprehensive documentation
@@ -466,6 +491,7 @@ By following this roadmap, the Inventory & Sales Management System will:
 ## Risk Mitigation
 
 Potential risks and mitigation strategies:
+
 - **Scope creep**: Stick to MVP features in first 5 weeks, defer enhancements to future releases
 - **Performance issues**: Implement database indexing and query optimization early
 - **Security vulnerabilities**: Conduct regular security reviews and follow best practices

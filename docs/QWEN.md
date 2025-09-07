@@ -20,9 +20,11 @@ This is a Next.js-based Point of Sale (POS) inventory management system with Mon
 src/
 ├── app/                 # Next.js app router pages and API routes
 │   ├── api/            # API routes
-│   ├── authenticated/  # Authenticated pages
 │   ├── login/          # Login page
-│   └── register/       # Registration page
+│   ├── register/       # Registration page
+│   ├── page.tsx        # Root dashboard page
+│   ├── layout.tsx      # Root layout
+│   └── globals.css     # Global styles
 ├── components/         # Reusable UI components
 ├── hooks/              # Custom React hooks
 ├── lib/                # Library functions (DB connection, auth middleware)
@@ -30,7 +32,6 @@ src/
 ├── schemas/            # Validation schemas (likely Zod)
 ├── scripts/            # Utility scripts
 ├── stores/             # Zustand stores (auth store)
-├── styles/             # Global styles
 ├── types/              # TypeScript type definitions
 └── utils/              # Utility functions (auth helpers)
 tests/                  # Test scripts
