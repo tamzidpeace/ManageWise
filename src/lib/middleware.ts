@@ -5,8 +5,8 @@ import { verifyToken } from '@/utils/auth';
 // Define paths that don't require authentication
 const publicPaths = ['/login', '/register'];
 
-// Define protected paths
-const protectedPaths = ['/dashboard'];
+// Define protected paths (root path is now protected)
+const protectedPaths = ['/'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -37,9 +37,9 @@ export async function middleware(request: NextRequest) {
     }
     
     // Check if user is trying to access protected paths
-    const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
+    const isProtectedPath = protectedPaths.some(path => pathname === path);
     if (isProtectedPath) {
-      // For now, allow all authenticated users to access the dashboard
+      // For now, allow all authenticated users to access the root/dashboard
       // We'll implement role-based content later
       return NextResponse.next();
     }
@@ -55,7 +55,7 @@ export async function middleware(request: NextRequest) {
 // Configure which paths the middleware should run on
 export const config = {
   matcher: [
-    '/dashboard/:path*',
+    '/',
     '/login',
     '/register',
   ],

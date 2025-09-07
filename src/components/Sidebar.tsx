@@ -4,11 +4,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'next/navigation';
 
-interface SidebarProps {
-  role: 'admin' | 'cashier';
-}
-
-export default function Sidebar({ role }: SidebarProps) {
+export default function Sidebar() {
   const { logout } = useAuthStore();
   const router = useRouter();
 
@@ -19,9 +15,9 @@ export default function Sidebar({ role }: SidebarProps) {
         method: 'POST',
         credentials: 'include',
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         // Clear the auth store
         logout();
@@ -38,7 +34,7 @@ export default function Sidebar({ role }: SidebarProps) {
     }
   };
 
-  const adminMenuItems = [
+  const menuItems = [
     { name: 'Dashboard', href: '/admin/dashboard' },
     { name: 'Products', href: '/admin/products' },
     { name: 'Categories', href: '/admin/categories' },
@@ -48,17 +44,9 @@ export default function Sidebar({ role }: SidebarProps) {
     { name: 'Reports', href: '/admin/reports' },
   ];
 
-  const cashierMenuItems = [
-    { name: 'Dashboard', href: '/cashier/dashboard' },
-    { name: 'POS', href: '/cashier/pos' },
-    { name: 'Orders', href: '/cashier/orders' },
-  ];
-
-  const menuItems = role === 'admin' ? adminMenuItems : cashierMenuItems;
-
   return (
-    <div className="w-64 bg-gray-800 text-white min-h-screen">
-      <div className="p-4 border-b border-gray-700">
+    <div className="min-h-screen w-64 bg-gray-800 text-white">
+      <div className="border-b border-gray-700 p-4">
         <h1 className="text-xl font-bold">Inventory POS</h1>
       </div>
       <nav className="mt-4">
@@ -67,7 +55,7 @@ export default function Sidebar({ role }: SidebarProps) {
             <li key={item.href}>
               <Link
                 href={item.href}
-                className="block py-3 px-4 hover:bg-gray-700 transition-colors"
+                className="block px-4 py-3 transition-colors hover:bg-gray-700"
               >
                 {item.name}
               </Link>
@@ -75,10 +63,10 @@ export default function Sidebar({ role }: SidebarProps) {
           ))}
         </ul>
       </nav>
-      <div className="absolute bottom-0 w-64 p-4 border-t border-gray-700">
+      <div className="absolute bottom-0 w-64 border-t border-gray-700 p-4">
         <button
           onClick={handleLogout}
-          className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+          className="w-full rounded-md bg-red-600 px-4 py-2 transition-colors hover:bg-red-700"
         >
           Logout
         </button>

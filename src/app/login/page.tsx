@@ -15,7 +15,7 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
-      router.push('/dashboard');
+      router.push('/');
     }
   }, [isAuthenticated, user, router]);
 
@@ -47,8 +47,8 @@ export default function LoginPage() {
           data.token
         );
 
-        // Redirect to dashboard
-        router.push('/dashboard');
+        // Redirect to root/dashboard
+        router.push('/');
       } else {
         setError(data.message);
       }

@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import './globals.css';
+import LayoutItems from './LayoutItems';
 
 export const metadata: Metadata = {
-  title: "Inventory POS System",
-  description: "Inventory and Sales Management System",
+  title: 'Inventory POS System',
+  description: 'Inventory and Sales Management System',
 };
 
 export default function RootLayout({
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        {children}
+        <LayoutItems children={children} />
       </body>
     </html>
   );
