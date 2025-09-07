@@ -63,8 +63,8 @@ export default function LoginPage() {
   // Don't render the form if the user is already authenticated
   if (isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
       </div>
     );
   }
