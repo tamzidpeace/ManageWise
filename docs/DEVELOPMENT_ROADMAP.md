@@ -2,6 +2,14 @@
 
 This document outlines a week-by-week development plan for building the Inventory & Sales Management System. The roadmap is structured to deliver a Minimum Viable Product (MVP) in the first few weeks, followed by enhancements and advanced features.
 
+## Instructions:
+ - think that you are a senior react, nodejs, nextjs and mern stack developer.
+ - you have a strong understanding of react, nodejs, nextjs and mern stack development.
+ - you have a strong understanding of mongodb and mongoose.
+ - you have a strong understanding of authentication and authorization.
+ - you have a strong understanding of UI design and user experience.
+ - you have a strong understanding of responsive design.
+
 ## Week 1: Project Setup & Authentication
 
 ### Goals:
@@ -80,7 +88,129 @@ This document outlines a week-by-week development plan for building the Inventor
   - If user click on cancel button, then the confirmation dialog will be closed.
   - If user click on outside of the dialog, then the confirmation dialog will be closed.
 
-## Week 2: Core Product Management
+### ✅ **Task: Test Environment Setup**  
+*Goal: Establish a robust, isolated testing environment for API endpoints with zero impact on development data*
+
+- [x] Install Testing Dependencies**  
+- Install Jest as the primary test runner  
+- Add Supertest for HTTP assertion capabilities  
+- Include MongoDB Memory Server for isolated database instances  
+- Install TypeScript support for Jest (ts-jest) and type definitions  
+- Verify all testing packages are in `devDependencies`  
+
+- [x] Configure Jest Core Settings**  
+- Create `jest.config.js` with Node.js test environment  
+- Set up TypeScript preprocessor (ts-jest)  
+- Configure test file pattern to target `/tests/**/*.test.ts`  
+- Enable automatic test coverage reporting  
+- Define setup file for global test initialization  
+
+- [x] Implement Test Database Isolation**  
+- Create `jest.setup.ts` initialization file  
+- Configure MongoDB Memory Server to spin up fresh instance per test run  
+- Establish automatic connection to in-memory database before tests  
+- Implement collection wipe between tests to prevent data leakage  
+- Add graceful shutdown of test database after all tests complete  
+
+- [x] Configure Test Execution Scripts**  
+- Add `test` script for standard test execution  
+- Include `test:watch` for continuous development testing  
+- Set up `test:coverage` for detailed coverage reports  
+- Ensure scripts work with TypeScript compilation  
+
+- [x] Establish Test Directory Structure**  
+- Create dedicated `tests/` root directory  
+- Mirror API route structure (e.g., `tests/api/auth/`)  
+- Prepare test file templates matching endpoint patterns  
+- Configure .gitignore to exclude test artifacts  
+
+- [x] Implement Critical Test Utilities**  
+- Set up automatic mocking of bcrypt operations  
+- Create helper for generating test authentication tokens  
+- Build request factory for authenticated API calls  
+- Prepare test data generators for user models  
+
+- [x] Validate Core Test Workflow**  
+- Verify test database isolation with sample test  
+- Confirm test coverage reporting functionality  
+- Test error handling in failed API scenarios  
+- Validate environment variable isolation from `.env` files  
+
+- [x] Document Testing Conventions**  
+- Define naming standards for test files  
+- Establish patterns for test organization  
+- Document database reset procedures  
+- Create contribution guidelines for new tests  
+
+- [x] Integrate with Development Workflow**  
+- Configure ESLint rules for test files  
+- Add Prettier support for test code formatting  
+- Set up pre-commit hooks for test execution  
+- Verify compatibility with existing CI pipeline  
+
+- [x] Create Baseline Test Suite**  
+- Write test for user registration endpoint (happy path)  
+- Implement duplicate email validation test  
+- Add password hashing verification test  
+- Create test for protected route authentication failure  
+- Validate test coverage for core authentication flows
+
+
+## Week 2: User Management & Role-Based Access
+
+### Goals:
+
+- Implement user management for administrators
+- Create role-based access control system
+- Enhance authentication with role support
+
+### Tasks:
+
+- [ ] Extend user schema with role field
+  - Add role field with enum values (admin, cashier)
+  - Set default role for new users
+  - Add validation for role values
+- [ ] Implement create user API endpoint (admin only)
+  - Create /api/users POST route
+  - Add admin authorization check
+  - Implement password generation or temporary password
+  - Send welcome/credentials to new user (optional)
+- [ ] Implement update user API endpoint (admin only)
+  - Create /api/users/[id] PUT route
+  - Allow role, name, and active status updates
+  - Add admin authorization check
+- [ ] Implement deactivate user API endpoint (admin only)
+  - Create /api/users/[id] DELETE route (soft delete)
+  - Add admin authorization check
+  - Update user active status instead of removing
+- [ ] Create user management dashboard UI (admin only)
+  - Design user listing table
+  - Add create/edit user forms
+  - Implement user search and filtering
+  - Add activate/deactivate controls
+- [ ] Implement role-based access control middleware
+  - Create middleware functions for role checks
+  - Add role validation to protected routes
+  - Implement permission-based access control
+- [ ] Create role-specific navigation and dashboards
+  - Design admin dashboard with full navigation
+  - Create cashier dashboard with limited navigation
+  - Implement dynamic navigation based on user role
+- [ ] Restrict access to admin-only features
+  - Add role checks to product management
+  - Add role checks to user management
+  - Add role checks to order cancellation/refund
+- [ ] Test role-based access controls
+  - Test admin access to all features
+  - Test cashier restrictions
+  - Verify API endpoint protection
+  - Test edge cases and unauthorized access attempts
+- [ ] Implement user activity logging
+  - Create log schema for user activities
+  - Add logging to critical operations
+  - Create log viewing interface (admin only)
+
+## Week 3: Core Product Management
 
 ### Goals:
 
@@ -143,7 +273,7 @@ This document outlines a week-by-week development plan for building the Inventor
   - Test soft delete functionality
   - Verify authorization restrictions
 
-## Week 3: Stock Management & Order Processing
+## Week 4: Stock Management & Order Processing
 
 ### Goals:
 
@@ -202,60 +332,6 @@ This document outlines a week-by-week development plan for building the Inventor
   - Test order creation with various scenarios
   - Test insufficient stock handling
   - Verify order status transitions
-
-## Week 4: User Management & Role-Based Access
-
-### Goals:
-
-- Implement user management for administrators
-- Create role-based access control system
-- Enhance authentication with role support
-
-### Tasks:
-
-- [ ] Extend user schema with role field
-  - Add role field with enum values (admin, cashier)
-  - Set default role for new users
-  - Add validation for role values
-- [ ] Implement create user API endpoint (admin only)
-  - Create /api/users POST route
-  - Add admin authorization check
-  - Implement password generation or temporary password
-  - Send welcome/credentials to new user (optional)
-- [ ] Implement update user API endpoint (admin only)
-  - Create /api/users/[id] PUT route
-  - Allow role, name, and active status updates
-  - Add admin authorization check
-- [ ] Implement deactivate user API endpoint (admin only)
-  - Create /api/users/[id] DELETE route (soft delete)
-  - Add admin authorization check
-  - Update user active status instead of removing
-- [ ] Create user management dashboard UI (admin only)
-  - Design user listing table
-  - Add create/edit user forms
-  - Implement user search and filtering
-  - Add activate/deactivate controls
-- [ ] Implement role-based access control middleware
-  - Create middleware functions for role checks
-  - Add role validation to protected routes
-  - Implement permission-based access control
-- [ ] Create role-specific navigation and dashboards
-  - Design admin dashboard with full navigation
-  - Create cashier dashboard with limited navigation
-  - Implement dynamic navigation based on user role
-- [ ] Restrict access to admin-only features
-  - Add role checks to product management
-  - Add role checks to user management
-  - Add role checks to order cancellation/refund
-- [ ] Test role-based access controls
-  - Test admin access to all features
-  - Test cashier restrictions
-  - Verify API endpoint protection
-  - Test edge cases and unauthorized access attempts
-- [ ] Implement user activity logging
-  - Create log schema for user activities
-  - Add logging to critical operations
-  - Create log viewing interface (admin only)
 
 ## Week 5: Reporting & Analytics
 
