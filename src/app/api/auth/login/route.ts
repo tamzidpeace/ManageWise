@@ -8,8 +8,6 @@ import { handleZodError } from '@/utils/validation';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('here');
-    
     await dbConnect();
     
     const body = await request.json();

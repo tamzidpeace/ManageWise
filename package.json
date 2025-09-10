@@ -12,7 +12,8 @@
     "test:coverage": "jest --coverage",
     "test:db": "node tests/test-db.js",
     "test:api": "node tests/api-test.js",
-    "test:integration": "jest --testPathPattern=tests/api/.*\\\\.test\\\\.ts$"
+    "test:integration": "jest --testPathPattern=tests/api/.*\\.test\\.ts$",
+    "test:run": "./scripts/run-tests.sh"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

@@ -1,201 +1,147 @@
 /**
  * @jest-environment node
  */
-import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+const {
+  connectToTestDB,
+  clearTestDB,
+  disconnectFromTestDB,
+} = require('../test-db-setup');
 import User from '@/models/User';
 import { hashPassword } from '@/utils/password';
-import { NextResponse } from 'next/server';
 
-// Mock dbConnect to use our test database
-jest.mock('@/lib/dbConnect', () => {
-  return jest.fn(() => Promise.resolve());
-});
+describe('User Management API Endpoints (Laravel/Pest Style)', () => {
+  let adminToken: string;
 
-// Mock NextResponse.json to capture responses
-const mockJson = jest.fn();
-const mockNextResponseJson = jest.fn((data, init) => {
-  mockJson(data, init);
-  return { status: init?.status || 200 };
-});
-
-jest.mock('next/server', () => ({
-  ...jest.requireActual('next/server'),
-  NextResponse: {
-    json: mockNextResponseJson,
-  },
-}));
-
-// Mock auth middleware
-jest.mock('@/lib/authMiddleware', () => ({
-  withRole: jest.fn((request, allowedRoles) => {
-    // Simulate successful authentication for admin
-    if (allowedRoles.includes('admin')) {
-      return Promise.resolve({ user: { role: 'admin' } });
-    }
-    // Simulate failed authentication
-    return Promise.resolve(
-      mockNextResponseJson({ success: false, message: 'Insufficient permissions' }, { status: 403 })
-    );
-  })
-}));
-
-describe('User Management API Endpoints', () => {
-  let mongoServer: MongoMemoryServer;
-  let adminUser: any;
-  let testUser: any;
-
+  // Connect to test database before running tests
   beforeAll(async () => {
-    // Set environment variables for testing
-    process.env.NODE_ENV = 'test';
-    process.env.JWT_SECRET = 'test-secret-key';
-    
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    process.env.MONGODB_URI = mongoUri;
-    
-    // Connect to the in-memory database
-    await mongoose.connect(mongoUri);
+    await connectToTestDB();
   });
 
-  afterAll(async () => {
-    await mongoose.disconnect();
-    if (mongoServer) {
-      await mongoServer.stop();
-    }
-  });
-
+  // Create test data before each test
   beforeEach(async () => {
-    const collections = mongoose.connection.collections;
-    for (const key in collections) {
-      const collection = collections[key];
-      await collection.deleteMany({});
-    }
-    jest.clearAllMocks();
+    // Clear database first
+    await clearTestDB();
     
-    // Create an admin user for testing protected endpoints
+    // Create an admin user for testing
     const hashedPassword = await hashPassword('password123');
-    adminUser = await User.create({
+    await User.create({
       name: 'Admin User',
-      email: 'admin@example.com',
+      email: 'admin@test.com',
       passwordHash: hashedPassword,
-      role: 'admin'
+      role: 'admin',
+      isActive: true,
     });
-    
-    // Create a test user
-    testUser = await User.create({
-      name: 'Test User',
-      email: 'test@example.com',
+
+    // Create a cashier user for testing
+    await User.create({
+      name: 'Cashier User',
+      email: 'cashier@test.com',
       passwordHash: hashedPassword,
-      role: 'cashier'
+      role: 'cashier',
+      isActive: true,
     });
+
+    // Login as admin to get a token for authenticated requests
+    const loginResponse = await fetch('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: 'admin@test.com',
+        password: 'password123',
+      }),
+    });
+
+    const loginData = await loginResponse.json();
+    adminToken = loginData.token;
   });
 
-  describe('GET /api/users', () => {
-    it('should list users when authenticated as admin', async () => {
-      // Dynamically import the handler after setting up the mock
-      const { GET: usersHandler } = await import('@/app/api/users/route');
-      
-      // Create a mock request
-      const mockRequest = {
-        url: 'http://localhost:3000/api/users',
-      } as unknown as Request;
-      
-      let users = await usersHandler(mockRequest as any);
-      console.log('users', users);
-      
-      
-      // Check if the response was successful
-      expect(mockJson).toHaveBeenCalledWith(
-        expect.objectContaining({
-          success: true,
-        }),
-        expect.objectContaining({
-          status: 200,
-        })
-      );
-    });
+  // Clear database after each test
+  afterEach(async () => {
+    await clearTestDB();
   });
 
-  // describe('POST /api/users', () => {
-  //   it('should create a new user when authenticated as admin', async () => {
-  //     // Dynamically import the handler after setting up the mock
-  //     const { POST: usersHandler } = await import('@/app/api/users/route');
-      
-  //     // Create a mock request with admin authorization
-  //     const mockRequest = {
-  //       json: jest.fn().mockResolvedValue({
-  //         name: 'New User',
-  //         email: 'newuser@example.com',
-  //         password: 'password123',
-  //         role: 'cashier'
-  //       }),
-  //     } as unknown as Request;
-      
-  //     await usersHandler(mockRequest as any);
-      
-  //     // Check if the response was successful
-  //     expect(mockJson).toHaveBeenCalledWith(
-  //       expect.objectContaining({
-  //         success: true,
-  //       }),
-  //       expect.objectContaining({
-  //         status: 201,
-  //       })
-  //     );
-      
-  //     // Verify user was created in database
-  //     const user = await User.findOne({ email: 'newuser@example.com' });
-  //     expect(user).toBeDefined();
-  //   });
-  // });
+  // Disconnect from database after all tests
+  afterAll(async () => {
+    await disconnectFromTestDB();
+  });
 
-  // describe('PUT /api/users/[id]', () => {
-  //   it('should update a user when authenticated as admin', async () => {
-  //     // Dynamically import the handler after setting up the mock
-  //     const { PUT: userHandler } = await import('@/app/api/users/[id]/route');
-      
-  //     // Create a mock request with admin authorization
-  //     const mockRequest = {
-  //       json: jest.fn().mockResolvedValue({
-  //         name: 'Updated User',
-  //         role: 'admin'
-  //       }),
-  //     } as unknown as Request;
-      
-  //     await userHandler(mockRequest as any, { params: { id: testUser._id.toString() } });
-      
-  //     // Check if the response was successful
-  //     expect(mockJson).toHaveBeenCalledWith(
-  //       expect.objectContaining({
-  //         success: true,
-  //       }),
-  //       expect.objectContaining({
-  //         status: 200,
-  //       })
-  //     );
-  //   });
-  // });
+  test('should login with valid credentials', async () => {
+    // Make actual HTTP request to the running server
+    const response = await fetch('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: 'admin@test.com',
+        password: 'password123',
+      }),
+    });
 
-  // describe('DELETE /api/users/[id]', () => {
-  //   it('should deactivate a user when authenticated as admin', async () => {
-  //     // Dynamically import the handler after setting up the mock
-  //     const { DELETE: userHandler } = await import('@/app/api/users/[id]/route');
-      
-  //     // Create a mock request with admin authorization
-  //     const mockRequest = {} as unknown as Request;
-      
-  //     await userHandler(mockRequest as any, { params: { id: testUser._id.toString() } });
-      
-  //     // Check if the response was successful
-  //     expect(mockJson).toHaveBeenCalledWith(
-  //       expect.objectContaining({
-  //         success: true,
-  //       }),
-  //       expect.objectContaining({
-  //         status: 200,
-  //       })
-  //     );
-  //   });
-  // });
+    const data = await response.json();
+
+    // Check that we get a successful response
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.token).toBeDefined();
+  });
+
+  test('should fetch users list with valid admin token', async () => {
+    // Fetch users with admin token
+    const response = await fetch('http://localhost:3000/api/users', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+      },
+    });
+
+    const data = await response.json();
+
+    // Assertions
+    expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(data.users).toBeDefined();
+    expect(Array.isArray(data.users)).toBe(true);
+    // We expect 2 users (admin and cashier)
+    expect(data.users.length).toBe(2);
+
+    // Check that passwordHash is not included
+    expect(data.users[0].passwordHash).toBeUndefined();
+    expect(data.users[1].passwordHash).toBeUndefined();
+  });
+
+  test('should create a new user with valid admin token', async () => {
+    // Create a new user
+    const response = await fetch('http://localhost:3000/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({
+        name: 'New Test User',
+        email: 'newuser@test.com',
+        password: 'newpassword123',
+        role: 'cashier',
+      }),
+    });
+
+    const data = await response.json();
+
+    // Assertions
+    expect(response.status).toBe(201);
+    expect(data.success).toBe(true);
+    expect(data.message).toBe('User created successfully');
+    expect(data.user).toBeDefined();
+    expect(data.user.name).toBe('New Test User');
+    expect(data.user.email).toBe('newuser@test.com');
+    expect(data.user.role).toBe('cashier');
+
+    // Verify user was actually created in database
+    const createdUser = await User.findOne({ email: 'newuser@test.com' });
+    expect(createdUser).toBeDefined();
+    expect(createdUser?.name).toBe('New Test User');
+  });
 });

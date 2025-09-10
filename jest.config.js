@@ -20,4 +20,6 @@ module.exports = {
   // Set timeout for integration tests
   testTimeout: 30000,
   extensionsToTreatAsEsm: ['.ts'],
+  maxConcurrency: 1,
+  maxWorkers: 1,
 };

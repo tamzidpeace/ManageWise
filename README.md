@@ -86,6 +86,35 @@ See [DEVELOPMENT_ROADMAP.md](docs/DEVELOPMENT_ROADMAP.md) for the complete devel
 - `npm run lint` - Run ESLint
 - `npm run test:db` - Test database connectivity
 - `npm run test:api` - Test API endpoints
+- `npm run test:run` - Run integration tests with proper database setup
+
+## Testing
+
+This project uses integration tests that follow a Laravel/Pest style approach:
+
+- Tests use a real MongoDB instance (not mocks)
+- Tests make actual HTTP requests to API endpoints
+- Each test runs with a clean database state
+- Tests require the test database to be set up
+
+### Running Tests
+
+To run tests, use the provided script which automatically:
+1. Starts the Next.js server with the test database
+2. Runs the tests
+3. Stops the server when done
+
+```bash
+npm run test:run
+```
+
+You can also run specific test files:
+```bash
+npm run test:run auth
+npm run test:run users
+```
+
+Note: Tests should be run individually or sequentially to avoid database conflicts when multiple test suites access the same database concurrently.
 
 ## Authentication
 
