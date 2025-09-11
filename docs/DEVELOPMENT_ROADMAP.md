@@ -186,27 +186,83 @@ This document outlines a week-by-week development plan for building the Inventor
   - Add create/edit user forms
   - Implement user search and filtering
   - Add activate/deactivate controls
-- [ ] Implement role-based access control middleware
-  - Create middleware functions for role checks
-  - Add role validation to protected routes
-  - Implement permission-based access control
-- [ ] Create role-specific navigation and dashboards
-  - Design admin dashboard with full navigation
-  - Create cashier dashboard with limited navigation
-  - Implement dynamic navigation based on user role
-- [ ] Restrict access to admin-only features
-  - Add role checks to product management
-  - Add role checks to user management
-  - Add role checks to order cancellation/refund
-- [ ] Test role-based access controls
-  - Test admin access to all features
-  - Test cashier restrictions
-  - Verify API endpoint protection
+
+### ✅ **Task: Implement Dynamic Role-Permission System**  
+*Goal: Replace current static role-based system with dynamic permission-based system following Spatie Laravel approach*
+
+- [x] **Design Permission-Based System Architecture**
+  - Define dynamic permissions model (view, add, update, delete, etc. for each feature)
+  - Create role model that can be assigned multiple permissions
+  - Design user-role relationship where users are assigned roles
+  - Plan permission-based route protection middleware
+  - Design frontend menu rendering based on user permissions
+
+- [x] **Create Database Models and Relationships**
+  - Create Permission Mongoose model with fields: name, description, feature
+  - Create Role Mongoose model with fields: name, description
+  - Implement many-to-many relationship between Roles and Permissions
+  - Add indexes for efficient permission lookups
+
+- [ ] **Implement Permission Management API**
+  - Create /api/permissions CRUD endpoints (admin only)
+  - Create /api/roles CRUD endpoints (admin only)
+  - Implement assign permissions to roles endpoint
+  - Create bulk permission assignment functionality
+  - Add permission validation and duplication prevention
+  - write tests
+
+- [ ] **Implement Role Management API**
+  - Create assign roles to users endpoint
+  - Implement role validation and duplication prevention
+  - Add role-based user listing filter
+  - Create role cloning functionality for easier setup
+  - write tests
+
+- [ ] **Replace Current Role-Based Middleware**
+  - Implement many-to-many relationship between Users and Roles
+  - Remove static role checking middleware
+  - Create permission-based middleware for route protection
+  - Implement permission checking functions (hasPermission, hasAnyPermission, hasAllPermissions)
+  - Add wildcard permission support for flexible permission checking
+  - Create middleware for both API routes and frontend route protection
+
+- [ ] **Update User Authentication Flow**
+  - Modify login to fetch user permissions along with role
+  - Update JWT token to include permissions
+  - Implement permission caching for performance
+  - Add permission refresh mechanism
+
+- [ ] **Implement Permission-Based UI Rendering**
+  - Update Sidebar component to render menus based on user permissions
+  - Create permission-based component visibility helpers
+  - Implement permission-based button/action visibility
+  - Add permission-based form field visibility
+
+- [ ] **Migrate Existing Functionality to Permission System**
+  - Convert existing role-based checks to permission-based checks
+  - Create default permissions for current features (user management, product management, etc.)
+  - Assign appropriate permissions to existing admin and cashier roles
+  - Migrate frontend menu visibility to permission-based system
+
+- [ ] **Create Permission Management Dashboard UI**
+  - Design permissions listing table with search/filter
+  - Create role management interface with permission assignment
+  - Implement visual permission assignment interface
+  - Add permission/role creation and editing forms
+
+- [ ] **Test Permission System**
+  - Test permission assignment to roles
+  - Test role assignment to users
+  - Verify route protection works with permissions
+  - Test frontend UI rendering based on permissions
+  - Validate permission caching and refresh mechanisms
   - Test edge cases and unauthorized access attempts
-- [ ] Implement user activity logging
-  - Create log schema for user activities
-  - Add logging to critical operations
-  - Create log viewing interface (admin only)
+
+- [ ] **Document Permission System**
+  - Create permission naming conventions
+  - Document permission-based development workflow
+  - Add examples for common permission patterns
+  - Create migration guide from role-based to permission-based system
 
 ## Week 3: Core Product Management
 

@@ -1,10 +1,14 @@
-require('dotenv').config({ path: require('path').resolve(__dirname, 'test.env') });
+require('dotenv').config({
+  path: require('path').resolve(__dirname, 'test.env'),
+});
 const mongoose = require('mongoose');
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable in test.env');
+  throw new Error(
+    'Please define the MONGODB_URI environment variable in test.env'
+  );
 }
 
 /**
@@ -25,11 +29,8 @@ async function connectToTestDB() {
  */
 async function clearTestDB() {
   try {
-    const collections = mongoose.connection.collections;
-    for (const key in collections) {
-      const collection = collections[key];
-      await collection.deleteMany({});
-    }
+    await mongoose.connection.dropDatabase();
+
     console.log('Test database cleared');
   } catch (error) {
     console.error('Error clearing test database:', error);
@@ -53,5 +54,5 @@ async function disconnectFromTestDB() {
 module.exports = {
   connectToTestDB,
   clearTestDB,
-  disconnectFromTestDB
+  disconnectFromTestDB,
 };
