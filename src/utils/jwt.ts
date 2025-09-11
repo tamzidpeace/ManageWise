@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server';
 export interface JwtPayload {
   userId: string;
   email: string;
-  role: string;
+  roles: string[];
   iat: number;
   exp: number;
 }

@@ -3,11 +3,13 @@
  */
 const { connectToTestDB, clearTestDB, disconnectFromTestDB } = require('../test-db-setup');
 import User from '@/models/User';
+import Role from '@/models/Role';
 import Permission from '@/models/Permission';
 import { hashPassword } from '@/utils/password';
 
 describe('Role API Endpoints (Laravel/Pest Style)', () => {
   let adminToken: string;
+  let adminRole: any;
 
   // Connect to test database before running tests
   beforeAll(async () => {
@@ -16,13 +18,16 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
 
   // Create test data before each test
   beforeEach(async () => {
+    // Create an admin role
+    adminRole = await Role.create({ name: 'admin', description: 'Administrator' });
+
     // Create an admin user for testing
     const hashedPassword = await hashPassword('admin123');
     await User.create({
       name: 'Admin User',
       email: 'admin@example.com',
       passwordHash: hashedPassword,
-      role: 'admin',
+      roles: [adminRole._id],
       isActive: true
     });
   });
@@ -124,7 +129,7 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
     expect(data.success).toBe(true);
     expect(data.roles).toBeDefined();
     expect(Array.isArray(data.roles)).toBe(true);
-    expect(data.roles.length).toBeGreaterThan(0);
+    expect(data.roles.length).toBeGreaterThan(1); // admin + editor
     expect(data.pagination).toBeDefined();
   });
 
@@ -359,6 +364,56 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
     expect(data.role.permissions).toBeDefined();
     expect(Array.isArray(data.role.permissions)).toBe(true);
     expect(data.role.permissions.length).toBe(2);
+  });
+
+  // Test cloning a role
+  test('should clone a role successfully', async () => {
+    // First login as admin to get a token
+    const loginResponse = await fetch('http://localhost:3000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: 'admin@example.com',
+        password: 'admin123',
+      }),
+    });
+
+    const loginData = await loginResponse.json();
+    adminToken = loginData.token;
+
+    // First create a role
+    const createRoleResponse = await fetch('http://localhost:3000/api/roles', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({
+        name: 'clone-test-role',
+        description: 'Role for cloning testing',
+      }),
+    });
+
+    const createRoleData = await createRoleResponse.json();
+    const roleId = createRoleData.role.id;
+
+    // Clone the role
+    const response = await fetch(`http://localhost:3000/api/roles/${roleId}/clone`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+      },
+    });
+
+    const data = await response.json();
+
+    // Assertions
+    expect(response.status).toBe(201);
+    expect(data.success).toBe(true);
+    expect(data.role).toBeDefined();
+    expect(data.role.name).toBe('Copy of clone-test-role');
   });
 
   // Test unauthorized access

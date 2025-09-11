@@ -7,11 +7,14 @@ const {
   disconnectFromTestDB,
 } = require('../test-db-setup');
 import User from '@/models/User';
+import Role from '@/models/Role';
 import { hashPassword } from '@/utils/password';
 
-describe('User Management API Endpoints (Laravel/Pest Style)', () => {
+describe('User Management API Endpoints', () => {
   let adminToken: string;
   let cashierToken: string;
+  let adminRole: any;
+  let cashierRole: any;
 
   // Connect to test database before running tests
   beforeAll(async () => {
@@ -23,13 +26,17 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
     // Clear database first
     await clearTestDB();
     
+    // Create roles
+    adminRole = await Role.create({ name: 'admin', description: 'Administrator' });
+    cashierRole = await Role.create({ name: 'cashier', description: 'Cashier' });
+
     // Create an admin user for testing
     const adminPassword = await hashPassword('password123');
     await User.create({
       name: 'Admin User',
       email: 'admin@test.com',
       passwordHash: adminPassword,
-      role: 'admin',
+      roles: [adminRole._id],
       isActive: true,
     });
 
@@ -39,7 +46,7 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
       name: 'Cashier User',
       email: 'cashier@test.com',
       passwordHash: cashierPassword,
-      role: 'cashier',
+      roles: [cashierRole._id],
       isActive: true,
     });
 
@@ -106,7 +113,7 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
     expect(data.token).toBeDefined();
     expect(data.user).toBeDefined();
     expect(data.user.email).toBe('admin@test.com');
-    expect(data.user.role).toBe('admin');
+    expect(data.user.roles).toContain('admin');
   });
 
   // Test user login with invalid credentials
@@ -140,6 +147,7 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
     });
 
     const data = await response.json();
+    
 
     // Assertions
     expect(response.status).toBe(200);
@@ -198,7 +206,7 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
     expect(Array.isArray(data.users)).toBe(true);
     // We expect 1 user (cashier)
     expect(data.users.length).toBe(1);
-    expect(data.users[0].role).toBe('cashier');
+    expect(data.users[0].roles[0].name).toBe('cashier');
   });
 
   // Test fetching users list with pagination
@@ -210,7 +218,7 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
         name: `Test User ${i}`,
         email: `test${i}@test.com`,
         passwordHash: hashedPassword,
-        role: 'cashier',
+        roles: [cashierRole._id],
         isActive: true,
       });
     }
@@ -250,7 +258,7 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
         name: 'New Test User',
         email: 'newuser@test.com',
         password: 'newpassword123',
-        role: 'cashier',
+        roles: [cashierRole._id],
       }),
     });
 
@@ -263,14 +271,14 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
     expect(data.user).toBeDefined();
     expect(data.user.name).toBe('New Test User');
     expect(data.user.email).toBe('newuser@test.com');
-    expect(data.user.role).toBe('cashier');
+    expect(data.user.roles.length).toBe(1);
     expect(data.user.isActive).toBe(true);
 
     // Verify user was actually created in database
-    const createdUser = await User.findOne({ email: 'newuser@test.com' });
+    const createdUser = await User.findOne({ email: 'newuser@test.com' }).populate('roles');
     expect(createdUser).toBeDefined();
     expect(createdUser?.name).toBe('New Test User');
-    expect(createdUser?.role).toBe('cashier');
+    expect(createdUser?.roles[0].name).toBe('cashier');
     expect(createdUser?.isActive).toBe(true);
   });
 
@@ -287,7 +295,7 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
         name: 'Duplicate User',
         email: 'admin@test.com', // This email already exists
         password: 'newpassword123',
-        role: 'cashier',
+        roles: [cashierRole._id],
       }),
     });
 
@@ -334,7 +342,7 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
         name: 'Invalid Email User',
         email: 'invalid-email', // Invalid email format
         password: 'newpassword123',
-        role: 'cashier',
+        roles: [cashierRole._id],
       }),
     });
 
@@ -358,7 +366,7 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
         name: 'Unauthorized User',
         email: 'unauthorized@test.com',
         password: 'newpassword123',
-        role: 'cashier',
+        roles: [cashierRole._id],
       }),
     });
 
@@ -382,7 +390,7 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
         name: 'Forbidden User',
         email: 'forbidden@test.com',
         password: 'newpassword123',
-        role: 'cashier',
+        roles: [cashierRole._id],
       }),
     });
 
@@ -393,8 +401,8 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
     expect(data.message).toBe('Insufficient permissions');
   });
 
-  // Test creating a user with default role
-  test('should create a user with default cashier role when not specified', async () => {
+  // Test creating a user with no roles
+  test('should create a user with no roles', async () => {
     // Create a user without specifying role
     const response = await fetch('http://localhost:3000/api/users', {
       method: 'POST',
@@ -403,10 +411,9 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
         Authorization: `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        name: 'Default Role User',
-        email: 'defaultrole@test.com',
+        name: 'No Role User',
+        email: 'norole@test.com',
         password: 'newpassword123',
-        // No role specified, should default to 'cashier'
       }),
     });
 
@@ -414,10 +421,10 @@ describe('User Management API Endpoints (Laravel/Pest Style)', () => {
 
     expect(response.status).toBe(201);
     expect(data.success).toBe(true);
-    expect(data.user.role).toBe('cashier'); // Should default to cashier
+    expect(data.user.roles.length).toBe(0);
 
     // Verify in database
-    const createdUser = await User.findOne({ email: 'defaultrole@test.com' });
-    expect(createdUser?.role).toBe('cashier');
+    const createdUser = await User.findOne({ email: 'norole@test.com' });
+    expect(createdUser?.roles.length).toBe(0);
   });
 });

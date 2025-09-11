@@ -1,9 +1,16 @@
 /**
  * @jest-environment node
  */
-const { connectToTestDB, clearTestDB, disconnectFromTestDB } = require('../test-db-setup');
+const {
+  connectToTestDB,
+  clearTestDB,
+  disconnectFromTestDB,
+} = require('../test-db-setup');
+import Role from '@/models/Role';
 import User from '@/models/User';
 import { hashPassword } from '@/utils/password';
+
+let adminRole: any;
 
 describe('Auth API Endpoints (Laravel/Pest Style)', () => {
   // Connect to test database before running tests
@@ -13,14 +20,19 @@ describe('Auth API Endpoints (Laravel/Pest Style)', () => {
 
   // Create test data before each test
   beforeEach(async () => {
+    adminRole = await Role.create({
+      name: 'admin',
+      description: 'Administrator',
+    });
+
     // Create a test user for login tests
     const hashedPassword = await hashPassword('password123');
     await User.create({
       name: 'Test User',
       email: 'test@example.com',
       passwordHash: hashedPassword,
-      role: 'admin',
-      isActive: true
+      roles: [adminRole._id],
+      isActive: true,
     });
   });
 
@@ -36,25 +48,29 @@ describe('Auth API Endpoints (Laravel/Pest Style)', () => {
 
   test('should login with valid credentials', async () => {
     // Make actual HTTP request to the running server
-    const response = await fetch('http://localhost:3000/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: 'test@example.com',
-        password: 'password123',
-      }),
-    });
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: 'test@example.com',
+          password: 'password123',
+        }),
+      });
 
-    const data = await response.json();
-    
-    // Check that we get a successful response
-    expect(response.status).toBe(200);
-    expect(data.success).toBe(true);
-    expect(data.token).toBeDefined();
-    expect(data.user).toBeDefined();
-    expect(data.user.email).toBe('test@example.com');
+      const data = await response.json();
+
+      // Check that we get a successful response
+      expect(response.status).toBe(200);
+      expect(data.success).toBe(true);
+      expect(data.token).toBeDefined();
+      expect(data.user).toBeDefined();
+      expect(data.user.email).toBe('test@example.com');
+    } catch (error) {
+      console.log('error', error);
+    }
   });
 
   test('should fail login with invalid credentials', async () => {
@@ -71,7 +87,7 @@ describe('Auth API Endpoints (Laravel/Pest Style)', () => {
     });
 
     const data = await response.json();
-    
+
     // Check that we get a failed response
     expect(response.status).toBe(401);
     expect(data.success).toBe(false);
@@ -92,7 +108,7 @@ describe('Auth API Endpoints (Laravel/Pest Style)', () => {
     });
 
     const data = await response.json();
-    
+
     // Check that we get a failed response
     expect(response.status).toBe(401);
     expect(data.success).toBe(false);

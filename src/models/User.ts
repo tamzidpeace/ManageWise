@@ -4,7 +4,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   passwordHash: string;
-  role: 'admin' | 'cashier';
+  roles: mongoose.Types.ObjectId[];
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -28,11 +28,13 @@ const UserSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    role: {
-      type: String,
-      enum: ['admin', 'cashier'],
-      default: 'cashier',
-    },
+    roles: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Role',
+        index: true,
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,
@@ -42,9 +44,5 @@ const UserSchema: Schema = new Schema(
     timestamps: true,
   }
 );
-
-// Add indexes
-UserSchema.index({ email: 1 });
-UserSchema.index({ role: 1 });
 
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);

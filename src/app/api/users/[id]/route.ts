@@ -9,15 +9,8 @@ import { z } from 'zod';
 const UserUpdateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters').optional(),
   email: z.string().email('Invalid email address').optional(),
-  role: z.enum(['admin', 'cashier']).optional(),
+  roles: z.array(z.string()).optional(),
   isActive: z.boolean().optional(),
-});
-
-// Schema for creating user with auto-generated password
-const UserCreateSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
-  email: z.string().email('Invalid email address'),
-  role: z.enum(['admin', 'cashier']).optional(),
 });
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
@@ -40,7 +33,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return handleZodError(validation.error);
     }
     
-    const { name, email, role, isActive } = validation.data;
+    const { name, email, roles, isActive } = validation.data;
     
     // Find user by ID
     const user = await User.findById(params.id);
@@ -65,7 +58,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     // Update user fields
     if (name !== undefined) user.name = name;
     if (email !== undefined) user.email = email;
-    if (role !== undefined) user.role = role;
+    if (roles !== undefined) user.roles = roles;
     if (isActive !== undefined) user.isActive = isActive;
     
     // Save updated user
@@ -80,7 +73,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
           id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role,
+          roles: user.roles,
           isActive: user.isActive,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
@@ -171,7 +164,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
           id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role,
+          roles: user.roles,
           isActive: user.isActive,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,

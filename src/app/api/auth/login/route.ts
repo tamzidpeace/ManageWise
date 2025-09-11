@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
+import Role from '@/models/Role';
 import { comparePasswords } from '@/utils/password';
 import jwt from 'jsonwebtoken';
 import { UserLoginSchema } from '@/schemas';
@@ -20,8 +21,8 @@ export async function POST(request: NextRequest) {
     
     const { email, password } = validation.data;
     
-    // Find user by email
-    const user = await User.findOne({ email });
+    // Find user by email and populate roles
+    const user = await User.findOne({ email }).populate('roles');
     if (!user) {
       return NextResponse.json(
         { success: false, message: 'Invalid credentials' },
@@ -46,12 +47,15 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // Get role names
+    const roleNames = user.roles ? user.roles.map((role: any) => role.name) : [];
+    
     // Generate JWT token
     const token = jwt.sign(
       { 
         userId: user._id,
         email: user.email,
-        role: user.role
+        roles: roleNames,
       },
       process.env.JWT_SECRET!,
       { expiresIn: '1d' }
@@ -66,7 +70,7 @@ export async function POST(request: NextRequest) {
           id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role,
+          roles: roleNames,
         },
         token
       },
