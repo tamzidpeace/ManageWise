@@ -10,8 +10,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:db": "node tests/test-db.js",
-    "test:api": "node tests/api-test.js"
+    "test:integration": "jest --testPathPattern=tests/api/.*\\.test\\.ts$",
+    "test:run": "./scripts/run-tests.sh"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -45,11 +45,9 @@
     "eslint-config-next": "^15.5.2",
     "eslint-config-prettier": "^9",
     "jest": "^30.1.3",
-    "mongodb-memory-server": "^10.2.0",
     "postcss": "^8.5.6",
     "prettier": "^3",
     "prettier-plugin-tailwindcss": "^0.5",
-    "supertest": "^7.1.4",
     "tailwindcss": "^4.1.13",
     "ts-jest": "^29.4.1",
     "tsx": "^4.7.1",

@@ -89,12 +89,10 @@ This document outlines a week-by-week development plan for building the Inventor
   - If user click on outside of the dialog, then the confirmation dialog will be closed.
 
 ### ✅ **Task: Test Environment Setup**  
-*Goal: Establish a robust, isolated testing environment for API endpoints with zero impact on development data*
+*Goal: Establish a robust, isolated testing environment for API endpoints following Laravel/Pest style approach*
 
 - [x] Install Testing Dependencies**  
 - Install Jest as the primary test runner  
-- Add Supertest for HTTP assertion capabilities  
-- Include MongoDB Memory Server for isolated database instances  
 - Install TypeScript support for Jest (ts-jest) and type definitions  
 - Verify all testing packages are in `devDependencies`  
 
@@ -102,58 +100,58 @@ This document outlines a week-by-week development plan for building the Inventor
 - Create `jest.config.js` with Node.js test environment  
 - Set up TypeScript preprocessor (ts-jest)  
 - Configure test file pattern to target `/tests/**/*.test.ts`  
-- Enable automatic test coverage reporting  
+- Enable sequential test execution to prevent database conflicts (`maxConcurrency: 1`, `maxWorkers: 1`)  
 - Define setup file for global test initialization  
 
 - [x] Implement Test Database Isolation**  
-- Create `jest.setup.ts` initialization file  
-- Configure MongoDB Memory Server to spin up fresh instance per test run  
-- Establish automatic connection to in-memory database before tests  
+- Create `test-db-setup.js` with database connection and cleanup utilities  
+- Configure separate MongoDB test database (`inventory-pos-test`)  
+- Establish automatic connection to test database before tests  
 - Implement collection wipe between tests to prevent data leakage  
 - Add graceful shutdown of test database after all tests complete  
 
 - [x] Configure Test Execution Scripts**  
-- Add `test` script for standard test execution  
+- Add `test:run` script for automated test execution with server management  
+- Add `test:sequential` for running all tests sequentially to avoid conflicts  
 - Include `test:watch` for continuous development testing  
 - Set up `test:coverage` for detailed coverage reports  
 - Ensure scripts work with TypeScript compilation  
 
 - [x] Establish Test Directory Structure**  
 - Create dedicated `tests/` root directory  
-- Mirror API route structure (e.g., `tests/api/auth/`)  
-- Prepare test file templates matching endpoint patterns  
+- Create `tests/api/` for API endpoint tests  
+- Prepare test file templates matching Laravel/Pest style approach  
 - Configure .gitignore to exclude test artifacts  
 
-- [x] Implement Critical Test Utilities**  
-- Set up automatic mocking of bcrypt operations  
-- Create helper for generating test authentication tokens  
-- Build request factory for authenticated API calls  
-- Prepare test data generators for user models  
+- [x] Implement Laravel/Pest Style Testing Approach**  
+- Create real database testing without mocks  
+- Implement actual HTTP requests to API endpoints  
+- Set up database isolation with clean state between tests  
+- Build reusable test utilities for common operations  
 
 - [x] Validate Core Test Workflow**  
 - Verify test database isolation with sample test  
-- Confirm test coverage reporting functionality  
+- Confirm sequential test execution prevents conflicts  
 - Test error handling in failed API scenarios  
-- Validate environment variable isolation from `.env` files  
+- Validate environment variable isolation  
 
 - [x] Document Testing Conventions**  
 - Define naming standards for test files  
-- Establish patterns for test organization  
+- Establish Laravel/Pest style patterns for test organization  
 - Document database reset procedures  
 - Create contribution guidelines for new tests  
 
 - [x] Integrate with Development Workflow**  
 - Configure ESLint rules for test files  
 - Add Prettier support for test code formatting  
-- Set up pre-commit hooks for test execution  
-- Verify compatibility with existing CI pipeline  
+- Set up automated test script for easy execution  
+- Verify compatibility with existing development workflow  
 
 - [x] Create Baseline Test Suite**  
-- Write test for user registration endpoint (happy path)  
-- Implement duplicate email validation test  
-- Add password hashing verification test  
-- Create test for protected route authentication failure  
-- Validate test coverage for core authentication flows
+- Write tests for authentication endpoints (login, registration)  
+- Implement user management API endpoint tests  
+- Add validation for role-based access control  
+- Create comprehensive test coverage for core authentication flows
 
 
 ## Week 2: User Management & Role-Based Access
@@ -188,27 +186,83 @@ This document outlines a week-by-week development plan for building the Inventor
   - Add create/edit user forms
   - Implement user search and filtering
   - Add activate/deactivate controls
-- [ ] Implement role-based access control middleware
-  - Create middleware functions for role checks
-  - Add role validation to protected routes
-  - Implement permission-based access control
-- [ ] Create role-specific navigation and dashboards
-  - Design admin dashboard with full navigation
-  - Create cashier dashboard with limited navigation
-  - Implement dynamic navigation based on user role
-- [ ] Restrict access to admin-only features
-  - Add role checks to product management
-  - Add role checks to user management
-  - Add role checks to order cancellation/refund
-- [ ] Test role-based access controls
-  - Test admin access to all features
-  - Test cashier restrictions
-  - Verify API endpoint protection
+
+### ✅ **Task: Implement Dynamic Role-Permission System**  
+*Goal: Replace current static role-based system with dynamic permission-based system following Spatie Laravel approach*
+
+- [x] **Design Permission-Based System Architecture**
+  - Define dynamic permissions model (view, add, update, delete, etc. for each feature)
+  - Create role model that can be assigned multiple permissions
+  - Design user-role relationship where users are assigned roles
+  - Plan permission-based route protection middleware
+  - Design frontend menu rendering based on user permissions
+
+- [x] **Create Database Models and Relationships**
+  - Create Permission Mongoose model with fields: name, description, feature
+  - Create Role Mongoose model with fields: name, description
+  - Implement many-to-many relationship between Roles and Permissions
+  - Add indexes for efficient permission lookups
+
+- [ ] **Implement Permission Management API**
+  - Create /api/permissions CRUD endpoints (admin only)
+  - Create /api/roles CRUD endpoints (admin only)
+  - Implement assign permissions to roles endpoint
+  - Create bulk permission assignment functionality
+  - Add permission validation and duplication prevention
+  - write tests
+
+- [ ] **Implement Role Management API**
+  - Create assign roles to users endpoint
+  - Implement role validation and duplication prevention
+  - Add role-based user listing filter
+  - Create role cloning functionality for easier setup
+  - write tests
+
+- [ ] **Replace Current Role-Based Middleware**
+  - Implement many-to-many relationship between Users and Roles
+  - Remove static role checking middleware
+  - Create permission-based middleware for route protection
+  - Implement permission checking functions (hasPermission, hasAnyPermission, hasAllPermissions)
+  - Add wildcard permission support for flexible permission checking
+  - Create middleware for both API routes and frontend route protection
+
+- [ ] **Update User Authentication Flow**
+  - Modify login to fetch user permissions along with role
+  - Update JWT token to include permissions
+  - Implement permission caching for performance
+  - Add permission refresh mechanism
+
+- [ ] **Implement Permission-Based UI Rendering**
+  - Update Sidebar component to render menus based on user permissions
+  - Create permission-based component visibility helpers
+  - Implement permission-based button/action visibility
+  - Add permission-based form field visibility
+
+- [ ] **Migrate Existing Functionality to Permission System**
+  - Convert existing role-based checks to permission-based checks
+  - Create default permissions for current features (user management, product management, etc.)
+  - Assign appropriate permissions to existing admin and cashier roles
+  - Migrate frontend menu visibility to permission-based system
+
+- [ ] **Create Permission Management Dashboard UI**
+  - Design permissions listing table with search/filter
+  - Create role management interface with permission assignment
+  - Implement visual permission assignment interface
+  - Add permission/role creation and editing forms
+
+- [ ] **Test Permission System**
+  - Test permission assignment to roles
+  - Test role assignment to users
+  - Verify route protection works with permissions
+  - Test frontend UI rendering based on permissions
+  - Validate permission caching and refresh mechanisms
   - Test edge cases and unauthorized access attempts
-- [ ] Implement user activity logging
-  - Create log schema for user activities
-  - Add logging to critical operations
-  - Create log viewing interface (admin only)
+
+- [ ] **Document Permission System**
+  - Create permission naming conventions
+  - Document permission-based development workflow
+  - Add examples for common permission patterns
+  - Create migration guide from role-based to permission-based system
 
 ## Week 3: Core Product Management
 
