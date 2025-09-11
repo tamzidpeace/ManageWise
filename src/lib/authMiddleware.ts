@@ -31,9 +31,14 @@ export async function withRole(request: NextRequest, allowedRoles: string[]) {
   }
   
   const { user } = authResult;
+
+  console.log('roles', allowedRoles, user);
   
-  // Check if user's role is in the allowed roles
-  if (!allowedRoles.includes(user.role)) {
+  
+  // Check if user has at least one of the allowed roles
+  const hasPermission = user.roles.some(role => allowedRoles.includes(role));
+  
+  if (!hasPermission) {
     return NextResponse.json(
       { success: false, message: 'Insufficient permissions' },
       { status: 403 }

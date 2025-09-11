@@ -203,15 +203,16 @@ This document outlines a week-by-week development plan for building the Inventor
   - Implement many-to-many relationship between Roles and Permissions
   - Add indexes for efficient permission lookups
 
-- [ ] **Implement Permission Management API**
+- [x] **Implement Permission Management API**
   - Create /api/permissions CRUD endpoints (admin only)
   - Create /api/roles CRUD endpoints (admin only)
   - Implement assign permissions to roles endpoint
   - Create bulk permission assignment functionality
   - Add permission validation and duplication prevention
-  - write tests
+  - Add test cases for permissions and roles
 
 - [ ] **Implement Role Management API**
+  - Implement many-to-many relationship between Users and Roles
   - Create assign roles to users endpoint
   - Implement role validation and duplication prevention
   - Add role-based user listing filter
@@ -219,7 +220,6 @@ This document outlines a week-by-week development plan for building the Inventor
   - write tests
 
 - [ ] **Replace Current Role-Based Middleware**
-  - Implement many-to-many relationship between Users and Roles
   - Remove static role checking middleware
   - Create permission-based middleware for route protection
   - Implement permission checking functions (hasPermission, hasAnyPermission, hasAllPermissions)

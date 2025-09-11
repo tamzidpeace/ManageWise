@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
+import Role from '@/models/Role';
 import { withRole } from '@/lib/authMiddleware';
 import { hashPassword } from '@/utils/password';
 import { handleZodError } from '@/utils/validation';
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const search = searchParams.get('search') || '';
-    const role = searchParams.get('role') || '';
+    const roleName = searchParams.get('role') || '';
     
     // Build filter object
     const filter: any = {};
@@ -38,8 +39,11 @@ export async function GET(request: NextRequest) {
       ];
     }
     
-    if (role) {
-      filter.role = role;
+    if (roleName) {
+      const role = await Role.findOne({ name: roleName });
+      if (role) {
+        filter.roles = role._id;
+      }
     }
     
     // Calculate skip for pagination
@@ -47,6 +51,7 @@ export async function GET(request: NextRequest) {
     
     // Fetch users with pagination
     const users = await User.find(filter)
+      .populate('roles')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -97,7 +102,7 @@ export async function POST(request: NextRequest) {
       return handleZodError(validation.error);
     }
     
-    const { name, email, password, role } = validation.data;
+    const { name, email, password, roles } = validation.data;
     
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -116,7 +121,7 @@ export async function POST(request: NextRequest) {
       name,
       email,
       passwordHash: hashedPassword,
-      role: role || 'cashier', // Default to 'cashier' if not provided
+      roles: roles || [],
     });
     
     // Return success response (without password hash)
@@ -128,7 +133,7 @@ export async function POST(request: NextRequest) {
           id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role,
+          roles: user.roles,
           isActive: user.isActive,
           createdAt: user.createdAt,
         }

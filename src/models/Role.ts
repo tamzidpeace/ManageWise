@@ -33,7 +33,4 @@ const RoleSchema: Schema = new Schema(
   }
 );
 
-// Add indexes
-RoleSchema.index({ name: 1 });
-
 export default mongoose.models.Role || mongoose.model<IRole>('Role', RoleSchema);

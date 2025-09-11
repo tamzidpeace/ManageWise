@@ -33,8 +33,4 @@ const PermissionSchema: Schema = new Schema(
   }
 );
 
-// Add indexes
-PermissionSchema.index({ name: 1 });
-PermissionSchema.index({ feature: 1 });
-
 export default mongoose.models.Permission || mongoose.model<IPermission>('Permission', PermissionSchema);

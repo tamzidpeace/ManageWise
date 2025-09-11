@@ -3,6 +3,7 @@
  */
 const { connectToTestDB, clearTestDB, disconnectFromTestDB } = require('../test-db-setup');
 import User from '@/models/User';
+import Role from '@/models/Role';
 import Permission from '@/models/Permission';
 import { hashPassword } from '@/utils/password';
 
@@ -16,13 +17,16 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
 
   // Create test data before each test
   beforeEach(async () => {
+    // Create an admin role
+    const adminRole = await Role.create({ name: 'admin', description: 'Administrator' });
+
     // Create an admin user for testing
     const hashedPassword = await hashPassword('admin123');
     await User.create({
       name: 'Admin User',
       email: 'admin@example.com',
       passwordHash: hashedPassword,
-      role: 'admin',
+      roles: [adminRole._id],
       isActive: true
     });
   });
