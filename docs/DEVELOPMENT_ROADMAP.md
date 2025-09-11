@@ -89,12 +89,10 @@ This document outlines a week-by-week development plan for building the Inventor
   - If user click on outside of the dialog, then the confirmation dialog will be closed.
 
 ### ✅ **Task: Test Environment Setup**  
-*Goal: Establish a robust, isolated testing environment for API endpoints with zero impact on development data*
+*Goal: Establish a robust, isolated testing environment for API endpoints following Laravel/Pest style approach*
 
 - [x] Install Testing Dependencies**  
 - Install Jest as the primary test runner  
-- Add Supertest for HTTP assertion capabilities  
-- Include MongoDB Memory Server for isolated database instances  
 - Install TypeScript support for Jest (ts-jest) and type definitions  
 - Verify all testing packages are in `devDependencies`  
 
@@ -102,58 +100,58 @@ This document outlines a week-by-week development plan for building the Inventor
 - Create `jest.config.js` with Node.js test environment  
 - Set up TypeScript preprocessor (ts-jest)  
 - Configure test file pattern to target `/tests/**/*.test.ts`  
-- Enable automatic test coverage reporting  
+- Enable sequential test execution to prevent database conflicts (`maxConcurrency: 1`, `maxWorkers: 1`)  
 - Define setup file for global test initialization  
 
 - [x] Implement Test Database Isolation**  
-- Create `jest.setup.ts` initialization file  
-- Configure MongoDB Memory Server to spin up fresh instance per test run  
-- Establish automatic connection to in-memory database before tests  
+- Create `test-db-setup.js` with database connection and cleanup utilities  
+- Configure separate MongoDB test database (`inventory-pos-test`)  
+- Establish automatic connection to test database before tests  
 - Implement collection wipe between tests to prevent data leakage  
 - Add graceful shutdown of test database after all tests complete  
 
 - [x] Configure Test Execution Scripts**  
-- Add `test` script for standard test execution  
+- Add `test:run` script for automated test execution with server management  
+- Add `test:sequential` for running all tests sequentially to avoid conflicts  
 - Include `test:watch` for continuous development testing  
 - Set up `test:coverage` for detailed coverage reports  
 - Ensure scripts work with TypeScript compilation  
 
 - [x] Establish Test Directory Structure**  
 - Create dedicated `tests/` root directory  
-- Mirror API route structure (e.g., `tests/api/auth/`)  
-- Prepare test file templates matching endpoint patterns  
+- Create `tests/api/` for API endpoint tests  
+- Prepare test file templates matching Laravel/Pest style approach  
 - Configure .gitignore to exclude test artifacts  
 
-- [x] Implement Critical Test Utilities**  
-- Set up automatic mocking of bcrypt operations  
-- Create helper for generating test authentication tokens  
-- Build request factory for authenticated API calls  
-- Prepare test data generators for user models  
+- [x] Implement Laravel/Pest Style Testing Approach**  
+- Create real database testing without mocks  
+- Implement actual HTTP requests to API endpoints  
+- Set up database isolation with clean state between tests  
+- Build reusable test utilities for common operations  
 
 - [x] Validate Core Test Workflow**  
 - Verify test database isolation with sample test  
-- Confirm test coverage reporting functionality  
+- Confirm sequential test execution prevents conflicts  
 - Test error handling in failed API scenarios  
-- Validate environment variable isolation from `.env` files  
+- Validate environment variable isolation  
 
 - [x] Document Testing Conventions**  
 - Define naming standards for test files  
-- Establish patterns for test organization  
+- Establish Laravel/Pest style patterns for test organization  
 - Document database reset procedures  
 - Create contribution guidelines for new tests  
 
 - [x] Integrate with Development Workflow**  
 - Configure ESLint rules for test files  
 - Add Prettier support for test code formatting  
-- Set up pre-commit hooks for test execution  
-- Verify compatibility with existing CI pipeline  
+- Set up automated test script for easy execution  
+- Verify compatibility with existing development workflow  
 
 - [x] Create Baseline Test Suite**  
-- Write test for user registration endpoint (happy path)  
-- Implement duplicate email validation test  
-- Add password hashing verification test  
-- Create test for protected route authentication failure  
-- Validate test coverage for core authentication flows
+- Write tests for authentication endpoints (login, registration)  
+- Implement user management API endpoint tests  
+- Add validation for role-based access control  
+- Create comprehensive test coverage for core authentication flows
 
 
 ## Week 2: User Management & Role-Based Access

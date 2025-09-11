@@ -3,7 +3,6 @@ module.exports = {
   testEnvironment: 'node',
   testMatch: ['**/tests/**/*.test.ts'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
-  setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.ts'],
   moduleDirectories: ['node_modules', 'src'],
   transform: {
     '^.+\\.tsx?$': [
