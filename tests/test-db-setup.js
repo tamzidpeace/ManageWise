@@ -30,8 +30,6 @@ async function connectToTestDB() {
 async function clearTestDB() {
   try {
     await mongoose.connection.dropDatabase();
-
-    console.log('Test database cleared');
   } catch (error) {
     console.error('Error clearing test database:', error);
     throw error;
