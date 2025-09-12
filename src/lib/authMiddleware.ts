@@ -31,8 +31,6 @@ export async function withRole(request: NextRequest, allowedRoles: string[]) {
   }
   
   const { user } = authResult;
-
-  console.log('roles', allowedRoles, user);
   
   
   // Check if user has at least one of the allowed roles
@@ -80,3 +78,39 @@ export async function withPermission(request: NextRequest, requiredPermission: s
 
   return authResult;
 }
+
+export async function withAnyPermission(request: NextRequest, requiredPermissions: string[]) {
+    const authResult = await withAuth(request);
+  
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+  
+    const { user } = authResult;
+  
+    if (!user.permissions) {
+      return NextResponse.json(
+        { success: false, message: 'Insufficient permissions' },
+        { status: 403 }
+      );
+    }
+  
+    const hasPermission = requiredPermissions.some(requiredPermission => 
+      user.permissions.some(permission => {
+        if (permission.endsWith('.*')) {
+          return requiredPermission.startsWith(permission.slice(0, -2));
+        }
+        return permission === requiredPermission;
+      })
+    );
+  
+    if (!hasPermission) {
+      return NextResponse.json(
+        { success: false, message: 'Insufficient permissions' },
+        { status: 403 }
+      );
+    }
+  
+    return authResult;
+  }
+  

@@ -6,10 +6,11 @@ import { withPermission } from '@/lib/authMiddleware';
 import { hashPassword } from '@/utils/password';
 import { handleZodError } from '@/utils/validation';
 import { UserRegistrationSchema } from '@/schemas';
+import { Permissions } from '@/schemas/permissions';
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await withPermission(request, 'users.view');
+    const authResult = await withPermission(request, Permissions.USERS_VIEW);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await withPermission(request, 'users.create');
+    const authResult = await withPermission(request, Permissions.USERS_CREATE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }

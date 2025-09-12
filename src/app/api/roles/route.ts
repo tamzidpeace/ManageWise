@@ -5,6 +5,7 @@ import Permission from '@/models/Permission';
 import { withPermission } from '@/lib/authMiddleware';
 import { handleZodError } from '@/utils/validation';
 import { z } from 'zod';
+import { Permissions } from '@/schemas/permissions';
 
 // Schema for creating role
 const RoleCreateSchema = z.object({
@@ -26,7 +27,7 @@ const AssignPermissionsSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await withPermission(request, 'roles.view');
+    const authResult = await withPermission(request, Permissions.ROLES_VIEW);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await withPermission(request, 'roles.create');
+    const authResult = await withPermission(request, Permissions.ROLES_CREATE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -148,7 +149,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const authResult = await withPermission(request, 'roles.update');
+    const authResult = await withPermission(request, Permissions.ROLES_UPDATE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -220,7 +221,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const authResult = await withPermission(request, 'roles.delete');
+    const authResult = await withPermission(request, Permissions.ROLES_DELETE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -261,7 +262,7 @@ export async function DELETE(request: NextRequest) {
 // Assign permissions to role
 export async function PATCH(request: NextRequest) {
   try {
-    const authResult = await withPermission(request, 'roles.assign_permissions');
+    const authResult = await withPermission(request, Permissions.ROLES_ASSIGN_PERMISSIONS);
     if (authResult instanceof NextResponse) {
       return authResult;
     }

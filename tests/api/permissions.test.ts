@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+import { Permissions } from '@/schemas/permissions';
 const { connectToTestDB, clearTestDB, disconnectFromTestDB } = require('../test-db-setup');
 import User from '@/models/User';
 import Role from '@/models/Role';
@@ -19,20 +20,20 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
   beforeEach(async () => {
     // Create permissions
     const permissions = await Permission.insertMany([
-      { name: 'users.view', feature: 'users' },
-      { name: 'users.create', feature: 'users' },
-      { name: 'users.update', feature: 'users' },
-      { name: 'users.delete', feature: 'users' },
-      { name: 'users.assign_roles', feature: 'users' },
-      { name: 'roles.view', feature: 'roles' },
-      { name: 'roles.create', feature: 'roles' },
-      { name: 'roles.update', feature: 'roles' },
-      { name: 'roles.delete', feature: 'roles' },
-      { name: 'roles.assign_permissions', feature: 'roles' },
-      { name: 'permissions.view', feature: 'permissions' },
-      { name: 'permissions.create', feature: 'permissions' },
-      { name: 'permissions.update', feature: 'permissions' },
-      { name: 'permissions.delete', feature: 'permissions' },
+      { name: Permissions.USERS_VIEW, feature: 'users' },
+      { name: Permissions.USERS_CREATE, feature: 'users' },
+      { name: Permissions.USERS_UPDATE, feature: 'users' },
+      { name: Permissions.USERS_DELETE, feature: 'users' },
+      { name: Permissions.USERS_ASSIGN_ROLES, feature: 'users' },
+      { name: Permissions.ROLES_VIEW, feature: 'roles' },
+      { name: Permissions.ROLES_CREATE, feature: 'roles' },
+      { name: Permissions.ROLES_UPDATE, feature: 'roles' },
+      { name: Permissions.ROLES_DELETE, feature: 'roles' },
+      { name: Permissions.ROLES_ASSIGN_PERMISSIONS, feature: 'roles' },
+      { name: Permissions.PERMISSIONS_VIEW, feature: 'permissions' },
+      { name: Permissions.PERMISSIONS_CREATE, feature: 'permissions' },
+      { name: Permissions.PERMISSIONS_UPDATE, feature: 'permissions' },
+      { name: Permissions.PERMISSIONS_DELETE, feature: 'permissions' },
     ]);
 
     // Create an admin role
@@ -159,7 +160,7 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    const permission = await Permission.findOne({ name: 'users.view' });
+    const permission = await Permission.findOne({ name: Permissions.USERS_VIEW });
 
     // Make actual HTTP request to the running server
     const response = await fetch('http://localhost:3000/api/permissions', {
@@ -205,7 +206,7 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    const permission = await Permission.findOne({ name: 'users.view' });
+    const permission = await Permission.findOne({ name: Permissions.USERS_VIEW });
 
     // Make actual HTTP request to the running server
     const response = await fetch('http://localhost:3000/api/permissions', {
@@ -252,7 +253,7 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
         'Authorization': `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        name: 'users.view',
+        name: Permissions.USERS_VIEW,
         description: 'Another test permission',
         feature: 'test-feature',
       }),

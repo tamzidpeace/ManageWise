@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+import { Permissions } from '@/schemas/permissions';
 const { connectToTestDB, clearTestDB, disconnectFromTestDB } = require('../test-db-setup');
 import User from '@/models/User';
 import Role from '@/models/Role';
@@ -20,11 +21,11 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
   beforeEach(async () => {
     // Create permissions
     const permissions = await Permission.insertMany([
-        { name: 'roles.view', feature: 'roles' },
-        { name: 'roles.create', feature: 'roles' },
-        { name: 'roles.update', feature: 'roles' },
-        { name: 'roles.delete', feature: 'roles' },
-        { name: 'roles.assign_permissions', feature: 'roles' },
+        { name: Permissions.ROLES_VIEW, feature: 'roles' },
+        { name: Permissions.ROLES_CREATE, feature: 'roles' },
+        { name: Permissions.ROLES_UPDATE, feature: 'roles' },
+        { name: Permissions.ROLES_DELETE, feature: 'roles' },
+        { name: Permissions.ROLES_ASSIGN_PERMISSIONS, feature: 'roles' },
     ]);
 
     // Create an admin role

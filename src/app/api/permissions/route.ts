@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Permission from '@/models/Permission';
-import { withRole } from '@/lib/authMiddleware';
+import { withPermission } from '@/lib/authMiddleware';
 import { handleZodError } from '@/utils/validation';
 import { z } from 'zod';
+import { Permissions } from '@/schemas/permissions';
 
 // Schema for creating permission
 const PermissionCreateSchema = z.object({
@@ -21,10 +22,7 @@ const PermissionUpdateSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    // Only admin can list permissions
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, Permissions.PERMISSIONS_VIEW);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -86,10 +84,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Only admin can create permissions
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, Permissions.PERMISSIONS_CREATE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -150,10 +145,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    // Only admin can update permissions
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, Permissions.PERMISSIONS_UPDATE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -223,10 +215,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    // Only admin can delete permissions
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, Permissions.PERMISSIONS_DELETE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }

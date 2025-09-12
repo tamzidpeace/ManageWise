@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+import { Permissions } from '@/schemas/permissions';
 const {
   connectToTestDB,
   clearTestDB,
@@ -29,8 +30,8 @@ describe('User Management API Endpoints', () => {
     
     // Create permissions
     const permissions = await Permission.insertMany([
-        { name: 'users.view', feature: 'users' },
-        { name: 'users.create', feature: 'users' },
+        { name: Permissions.USERS_VIEW, feature: 'users' },
+        { name: Permissions.USERS_CREATE, feature: 'users' },
     ]);
 
     // Create roles
