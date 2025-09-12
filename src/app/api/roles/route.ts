@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Role from '@/models/Role';
 import Permission from '@/models/Permission';
-import { withRole } from '@/lib/authMiddleware';
+import { withPermission } from '@/lib/authMiddleware';
 import { handleZodError } from '@/utils/validation';
 import { z } from 'zod';
 
@@ -26,10 +26,7 @@ const AssignPermissionsSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    // Only admin can list roles
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, 'roles.view');
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -88,10 +85,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Only admin can create roles
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, 'roles.create');
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -154,10 +148,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    // Only admin can update roles
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, 'roles.update');
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -229,10 +220,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    // Only admin can delete roles
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, 'roles.delete');
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -273,10 +261,7 @@ export async function DELETE(request: NextRequest) {
 // Assign permissions to role
 export async function PATCH(request: NextRequest) {
   try {
-    // Only admin can assign permissions to roles
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, 'roles.assign_permissions');
     if (authResult instanceof NextResponse) {
       return authResult;
     }

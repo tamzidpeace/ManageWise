@@ -2,17 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import Role from '@/models/Role';
-import { withRole } from '@/lib/authMiddleware';
+import { withPermission } from '@/lib/authMiddleware';
 import { hashPassword } from '@/utils/password';
 import { handleZodError } from '@/utils/validation';
 import { UserRegistrationSchema } from '@/schemas';
 
 export async function GET(request: NextRequest) {
   try {
-    // Only admin can list users
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, 'users.view');
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -84,10 +81,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Only admin can create users
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, 'users.create');
     if (authResult instanceof NextResponse) {
       return authResult;
     }

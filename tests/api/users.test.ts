@@ -8,6 +8,7 @@ const {
 } = require('../test-db-setup');
 import User from '@/models/User';
 import Role from '@/models/Role';
+import Permission from '@/models/Permission';
 import { hashPassword } from '@/utils/password';
 
 describe('User Management API Endpoints', () => {
@@ -26,8 +27,14 @@ describe('User Management API Endpoints', () => {
     // Clear database first
     await clearTestDB();
     
+    // Create permissions
+    const permissions = await Permission.insertMany([
+        { name: 'users.view', feature: 'users' },
+        { name: 'users.create', feature: 'users' },
+    ]);
+
     // Create roles
-    adminRole = await Role.create({ name: 'admin', description: 'Administrator' });
+    adminRole = await Role.create({ name: 'admin', description: 'Administrator', permissions: permissions.map(p => p._id) });
     cashierRole = await Role.create({ name: 'cashier', description: 'Cashier' });
 
     // Create an admin user for testing

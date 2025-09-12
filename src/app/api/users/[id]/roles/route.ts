@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import Role from '@/models/Role';
-import { withRole } from '@/lib/authMiddleware';
+import { withPermission } from '@/lib/authMiddleware';
 import { handleZodError } from '@/utils/validation';
 import { z } from 'zod';
 
@@ -12,7 +12,7 @@ const AssignRolesSchema = z.object({
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const authResult = await withRole(request, ['admin']);
+    const authResult = await withPermission(request, 'users.assign_roles');
     if (authResult instanceof NextResponse) {
       return authResult;
     }

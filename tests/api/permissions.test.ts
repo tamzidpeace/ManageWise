@@ -17,8 +17,30 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
 
   // Create test data before each test
   beforeEach(async () => {
+    // Create permissions
+    const permissions = await Permission.insertMany([
+      { name: 'users.view', feature: 'users' },
+      { name: 'users.create', feature: 'users' },
+      { name: 'users.update', feature: 'users' },
+      { name: 'users.delete', feature: 'users' },
+      { name: 'users.assign_roles', feature: 'users' },
+      { name: 'roles.view', feature: 'roles' },
+      { name: 'roles.create', feature: 'roles' },
+      { name: 'roles.update', feature: 'roles' },
+      { name: 'roles.delete', feature: 'roles' },
+      { name: 'roles.assign_permissions', feature: 'roles' },
+      { name: 'permissions.view', feature: 'permissions' },
+      { name: 'permissions.create', feature: 'permissions' },
+      { name: 'permissions.update', feature: 'permissions' },
+      { name: 'permissions.delete', feature: 'permissions' },
+    ]);
+
     // Create an admin role
-    const adminRole = await Role.create({ name: 'admin', description: 'Administrator' });
+    const adminRole = await Role.create({ 
+      name: 'admin', 
+      description: 'Administrator',
+      permissions: permissions.map(p => p._id)
+    });
 
     // Create an admin user for testing
     const hashedPassword = await hashPassword('admin123');
@@ -101,20 +123,6 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    // First create a permission
-    await fetch('http://localhost:3000/api/permissions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        name: 'edit-users',
-        description: 'Permission to edit users',
-        feature: 'user-management',
-      }),
-    });
-
     // Make actual HTTP request to the running server
     const response = await fetch('http://localhost:3000/api/permissions', {
       method: 'GET',
@@ -151,22 +159,7 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    // First create a permission
-    const createResponse = await fetch('http://localhost:3000/api/permissions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        name: 'delete-users',
-        description: 'Permission to delete users',
-        feature: 'user-management',
-      }),
-    });
-
-    const createData = await createResponse.json();
-    const permissionId = createData.permission.id;
+    const permission = await Permission.findOne({ name: 'users.view' });
 
     // Make actual HTTP request to the running server
     const response = await fetch('http://localhost:3000/api/permissions', {
@@ -176,7 +169,7 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
         'Authorization': `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        id: permissionId,
+        id: permission._id,
         name: 'delete-users-updated',
         description: 'Updated permission to delete users',
         feature: 'user-management-updated',
@@ -212,22 +205,7 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    // First create a permission
-    const createResponse = await fetch('http://localhost:3000/api/permissions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        name: 'manage-roles',
-        description: 'Permission to manage roles',
-        feature: 'role-management',
-      }),
-    });
-
-    const createData = await createResponse.json();
-    const permissionId = createData.permission.id;
+    const permission = await Permission.findOne({ name: 'users.view' });
 
     // Make actual HTTP request to the running server
     const response = await fetch('http://localhost:3000/api/permissions', {
@@ -237,7 +215,7 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
         'Authorization': `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        id: permissionId,
+        id: permission._id,
       }),
     });
 
@@ -266,20 +244,6 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    // First create a permission
-    await fetch('http://localhost:3000/api/permissions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        name: 'duplicate-test',
-        description: 'Test permission',
-        feature: 'test-feature',
-      }),
-    });
-
     // Try to create another permission with the same name
     const response = await fetch('http://localhost:3000/api/permissions', {
       method: 'POST',
@@ -288,7 +252,7 @@ describe('Permission API Endpoints (Laravel/Pest Style)', () => {
         'Authorization': `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        name: 'duplicate-test',
+        name: 'users.view',
         description: 'Another test permission',
         feature: 'test-feature',
       }),

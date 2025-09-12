@@ -21,8 +21,15 @@ export async function POST(request: NextRequest) {
     
     const { email, password } = validation.data;
     
-    // Find user by email and populate roles
-    const user = await User.findOne({ email }).populate('roles');
+    // Find user by email and populate roles with permissions
+    const user = await User.findOne({ email }).populate({
+      path: 'roles',
+      populate: {
+        path: 'permissions',
+        model: 'Permission'
+      }
+    });
+
     if (!user) {
       return NextResponse.json(
         { success: false, message: 'Invalid credentials' },
@@ -47,15 +54,17 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Get role names
+    // Get role names and permissions
     const roleNames = user.roles ? user.roles.map((role: any) => role.name) : [];
-    
+    const permissions = user.roles ? [...new Set(user.roles.flatMap((role: any) => role.permissions.map((p: any) => p.name)))] : [];
+
     // Generate JWT token
     const token = jwt.sign(
       { 
         userId: user._id,
         email: user.email,
         roles: roleNames,
+        permissions: permissions,
       },
       process.env.JWT_SECRET!,
       { expiresIn: '1d' }
@@ -71,6 +80,7 @@ export async function POST(request: NextRequest) {
           name: user.name,
           email: user.email,
           roles: roleNames,
+          permissions: permissions,
         },
         token
       },
