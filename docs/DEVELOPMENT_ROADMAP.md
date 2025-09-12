@@ -211,7 +211,7 @@ This document outlines a week-by-week development plan for building the Inventor
   - Add permission validation and duplication prevention
   - Add test cases for permissions and roles
 
-- [ ] **Implement Role Management API**
+- [x] **Implement Role Management API**
   - Implement many-to-many relationship between Users and Roles
   - Create assign roles to users endpoint
   - Implement role validation and duplication prevention

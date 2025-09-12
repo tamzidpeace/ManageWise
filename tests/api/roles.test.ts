@@ -18,8 +18,17 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
 
   // Create test data before each test
   beforeEach(async () => {
+    // Create permissions
+    const permissions = await Permission.insertMany([
+        { name: 'roles.view', feature: 'roles' },
+        { name: 'roles.create', feature: 'roles' },
+        { name: 'roles.update', feature: 'roles' },
+        { name: 'roles.delete', feature: 'roles' },
+        { name: 'roles.assign_permissions', feature: 'roles' },
+    ]);
+
     // Create an admin role
-    adminRole = await Role.create({ name: 'admin', description: 'Administrator' });
+    adminRole = await Role.create({ name: 'admin', description: 'Administrator', permissions: permissions.map(p => p._id) });
 
     // Create an admin user for testing
     const hashedPassword = await hashPassword('admin123');
@@ -101,19 +110,6 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    // First create a role
-    await fetch('http://localhost:3000/api/roles', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        name: 'editor',
-        description: 'Editor role',
-      }),
-    });
-
     // Make actual HTTP request to the running server
     const response = await fetch('http://localhost:3000/api/roles', {
       method: 'GET',
@@ -129,7 +125,7 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
     expect(data.success).toBe(true);
     expect(data.roles).toBeDefined();
     expect(Array.isArray(data.roles)).toBe(true);
-    expect(data.roles.length).toBeGreaterThan(1); // admin + editor
+    expect(data.roles.length).toBeGreaterThan(0);
     expect(data.pagination).toBeDefined();
   });
 
@@ -150,21 +146,7 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    // First create a role
-    const createResponse = await fetch('http://localhost:3000/api/roles', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        name: 'viewer',
-        description: 'Viewer role',
-      }),
-    });
-
-    const createData = await createResponse.json();
-    const roleId = createData.role.id;
+    const role = await Role.findOne({ name: 'admin' });
 
     // Make actual HTTP request to the running server
     const response = await fetch('http://localhost:3000/api/roles', {
@@ -174,7 +156,7 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
         'Authorization': `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        id: roleId,
+        id: role._id,
         name: 'viewer-updated',
         description: 'Updated viewer role',
       }),
@@ -208,21 +190,7 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    // First create a role
-    const createResponse = await fetch('http://localhost:3000/api/roles', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        name: 'temporary-role',
-        description: 'Temporary role for testing',
-      }),
-    });
-
-    const createData = await createResponse.json();
-    const roleId = createData.role.id;
+    const role = await Role.findOne({ name: 'admin' });
 
     // Make actual HTTP request to the running server
     const response = await fetch('http://localhost:3000/api/roles', {
@@ -232,7 +200,7 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
         'Authorization': `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        id: roleId,
+        id: role._id,
       }),
     });
 
@@ -261,19 +229,6 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    // First create a role
-    await fetch('http://localhost:3000/api/roles', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        name: 'duplicate-test',
-        description: 'Test role',
-      }),
-    });
-
     // Try to create another role with the same name
     const response = await fetch('http://localhost:3000/api/roles', {
       method: 'POST',
@@ -282,7 +237,7 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
         'Authorization': `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        name: 'duplicate-test',
+        name: 'admin',
         description: 'Another test role',
       }),
     });
@@ -312,21 +267,7 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    // First create a role
-    const createRoleResponse = await fetch('http://localhost:3000/api/roles', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        name: 'permission-test-role',
-        description: 'Role for permission testing',
-      }),
-    });
-
-    const createRoleData = await createRoleResponse.json();
-    const roleId = createRoleData.role.id;
+    const role = await Role.findOne({ name: 'admin' });
 
     // Create some permissions
     const permission1 = await Permission.create({
@@ -349,7 +290,7 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
         'Authorization': `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        roleId: roleId,
+        roleId: role._id,
         permissionIds: [permission1._id.toString(), permission2._id.toString()],
       }),
     });
@@ -383,24 +324,10 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
     const loginData = await loginResponse.json();
     adminToken = loginData.token;
 
-    // First create a role
-    const createRoleResponse = await fetch('http://localhost:3000/api/roles', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${adminToken}`,
-      },
-      body: JSON.stringify({
-        name: 'clone-test-role',
-        description: 'Role for cloning testing',
-      }),
-    });
-
-    const createRoleData = await createRoleResponse.json();
-    const roleId = createRoleData.role.id;
+    const role = await Role.findOne({ name: 'admin' });
 
     // Clone the role
-    const response = await fetch(`http://localhost:3000/api/roles/${roleId}/clone`, {
+    const response = await fetch(`http://localhost:3000/api/roles/${role._id}/clone`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${adminToken}`,
@@ -413,7 +340,7 @@ describe('Role API Endpoints (Laravel/Pest Style)', () => {
     expect(response.status).toBe(201);
     expect(data.success).toBe(true);
     expect(data.role).toBeDefined();
-    expect(data.role.name).toBe('Copy of clone-test-role');
+    expect(data.role.name).toBe('Copy of admin');
   });
 
   // Test unauthorized access

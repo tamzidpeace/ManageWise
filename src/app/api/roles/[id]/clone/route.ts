@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Role from '@/models/Role';
-import { withRole } from '@/lib/authMiddleware';
+import { withPermission } from '@/lib/authMiddleware';
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const authResult = await withRole(request, ['admin']);
+    const authResult = await withPermission(request, 'roles.create');
     if (authResult instanceof NextResponse) {
       return authResult;
     }

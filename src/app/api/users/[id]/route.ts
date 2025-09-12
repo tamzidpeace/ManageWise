@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
-import { withRole } from '@/lib/authMiddleware';
+import { withPermission } from '@/lib/authMiddleware';
 import { handleZodError } from '@/utils/validation';
 import { z } from 'zod';
 
@@ -15,10 +15,7 @@ const UserUpdateSchema = z.object({
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    // Only admin can update users
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, 'users.update');
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -92,10 +89,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    // Only admin can deactivate users
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, 'users.delete');
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -133,10 +127,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    // Only admin can activate users
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    const authResult = await withPermission(request, 'users.update');
     if (authResult instanceof NextResponse) {
       return authResult;
     }

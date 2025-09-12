@@ -8,6 +8,7 @@ const {
 } = require('../test-db-setup');
 import User from '@/models/User';
 import Role from '@/models/Role';
+import Permission from '@/models/Permission';
 import { hashPassword } from '@/utils/password';
 
 describe('User Roles API Endpoint', () => {
@@ -23,7 +24,11 @@ describe('User Roles API Endpoint', () => {
   beforeEach(async () => {
     await clearTestDB();
 
-    const adminRole = await Role.create({ name: 'admin', description: 'Administrator' });
+    const permissions = await Permission.insertMany([
+        { name: 'users.assign_roles', feature: 'users' },
+    ]);
+
+    const adminRole = await Role.create({ name: 'admin', description: 'Administrator', permissions: permissions.map(p => p._id) });
     managerRole = await Role.create({ name: 'manager', description: 'Manager' });
 
     const adminPassword = await hashPassword('password123');
