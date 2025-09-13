@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import { withPermission } from '@/lib/authMiddleware';
+import { Permissions } from '@/schemas/permissions';
 import { handleZodError } from '@/utils/validation';
 import { z } from 'zod';
 
@@ -13,9 +14,52 @@ const UserUpdateSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const authResult = await withPermission(request, Permissions.USERS_VIEW);
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    
+    await dbConnect();
+    
+    // Find user by ID and populate roles
+    const user = await User.findById(params.id).populate('roles');
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: 'User not found' },
+        { status: 404 }
+      );
+    }
+    
+    // Return user data (without password hash)
+    return NextResponse.json(
+      { 
+        success: true, 
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          roles: user.roles,
+          isActive: user.isActive,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        }
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('User fetch error:', error);
+    return NextResponse.json(
+      { success: false, message: 'An error occurred while fetching the user' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const authResult = await withPermission(request, 'users.update');
+    const authResult = await withPermission(request, Permissions.USERS_UPDATE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -61,6 +105,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     // Save updated user
     await user.save();
     
+    // Populate roles for response
+    await user.populate('roles');
+    
     // Return success response (without password hash)
     return NextResponse.json(
       { 
@@ -89,7 +136,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const authResult = await withPermission(request, 'users.delete');
+    const authResult = await withPermission(request, Permissions.USERS_DELETE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -127,7 +174,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const authResult = await withPermission(request, 'users.update');
+    const authResult = await withPermission(request, Permissions.USERS_UPDATE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -146,6 +193,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     // Activate user
     user.isActive = true;
     await user.save();
+    
+    // Populate roles for response
+    await user.populate('roles');
     
     return NextResponse.json(
       { 

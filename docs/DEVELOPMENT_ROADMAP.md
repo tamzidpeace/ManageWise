@@ -3,12 +3,13 @@
 This document outlines a week-by-week development plan for building the Inventory & Sales Management System. The roadmap is structured to deliver a Minimum Viable Product (MVP) in the first few weeks, followed by enhancements and advanced features.
 
 ## Instructions:
- - think that you are a senior react, nodejs, nextjs and mern stack developer.
- - you have a strong understanding of react, nodejs, nextjs and mern stack development.
- - you have a strong understanding of mongodb and mongoose.
- - you have a strong understanding of authentication and authorization.
- - you have a strong understanding of UI design and user experience.
- - you have a strong understanding of responsive design.
+
+- think that you are a senior react, nodejs, nextjs and mern stack developer.
+- you have a strong understanding of react, nodejs, nextjs and mern stack development.
+- you have a strong understanding of mongodb and mongoose.
+- you have a strong understanding of authentication and authorization.
+- you have a strong understanding of UI design and user experience.
+- you have a strong understanding of responsive design.
 
 ## Week 1: Project Setup & Authentication
 
@@ -88,76 +89,71 @@ This document outlines a week-by-week development plan for building the Inventor
   - If user click on cancel button, then the confirmation dialog will be closed.
   - If user click on outside of the dialog, then the confirmation dialog will be closed.
 
-### ✅ **Task: Test Environment Setup**  
-*Goal: Establish a robust, isolated testing environment for API endpoints following Laravel/Pest style approach*
+### ✅ **Task: Test Environment Setup**
 
-- [x] Install Testing Dependencies**  
-- Install Jest as the primary test runner  
-- Install TypeScript support for Jest (ts-jest) and type definitions  
-- Verify all testing packages are in `devDependencies`  
+_Goal: Establish a robust, isolated testing environment for API endpoints following Laravel/Pest style approach_
 
-- [x] Configure Jest Core Settings**  
-- Create `jest.config.js` with Node.js test environment  
-- Set up TypeScript preprocessor (ts-jest)  
-- Configure test file pattern to target `/tests/**/*.test.ts`  
-- Enable sequential test execution to prevent database conflicts (`maxConcurrency: 1`, `maxWorkers: 1`)  
-- Define setup file for global test initialization  
+- [x] Install Testing Dependencies\*\*
+- Install Jest as the primary test runner
+- Install TypeScript support for Jest (ts-jest) and type definitions
+- Verify all testing packages are in `devDependencies`
 
-- [x] Implement Test Database Isolation**  
-- Create `test-db-setup.js` with database connection and cleanup utilities  
-- Configure separate MongoDB test database (`inventory-pos-test`)  
-- Establish automatic connection to test database before tests  
-- Implement collection wipe between tests to prevent data leakage  
-- Add graceful shutdown of test database after all tests complete  
+- [x] Configure Jest Core Settings\*\*
+- Create `jest.config.js` with Node.js test environment
+- Set up TypeScript preprocessor (ts-jest)
+- Configure test file pattern to target `/tests/**/*.test.ts`
+- Enable sequential test execution to prevent database conflicts (`maxConcurrency: 1`, `maxWorkers: 1`)
+- Define setup file for global test initialization
 
-- [x] Configure Test Execution Scripts**  
-- Add `test:run` script for automated test execution with server management  
-- Add `test:sequential` for running all tests sequentially to avoid conflicts  
-- Include `test:watch` for continuous development testing  
-- Set up `test:coverage` for detailed coverage reports  
-- Ensure scripts work with TypeScript compilation  
+- [x] Implement Test Database Isolation\*\*
+- Create `test-db-setup.js` with database connection and cleanup utilities
+- Configure separate MongoDB test database (`inventory-pos-test`)
+- Establish automatic connection to test database before tests
+- Implement collection wipe between tests to prevent data leakage
+- Add graceful shutdown of test database after all tests complete
 
-- [x] Establish Test Directory Structure**  
-- Create dedicated `tests/` root directory  
-- Create `tests/api/` for API endpoint tests  
-- Prepare test file templates matching Laravel/Pest style approach  
-- Configure .gitignore to exclude test artifacts  
+- [x] Configure Test Execution Scripts\*\*
+- Add `test:run` script for automated test execution with server management
+- Add `test:sequential` for running all tests sequentially to avoid conflicts
+- Include `test:watch` for continuous development testing
+- Set up `test:coverage` for detailed coverage reports
+- Ensure scripts work with TypeScript compilation
 
-- [x] Implement Laravel/Pest Style Testing Approach**  
-- Create real database testing without mocks  
-- Implement actual HTTP requests to API endpoints  
-- Set up database isolation with clean state between tests  
-- Build reusable test utilities for common operations  
+- [x] Establish Test Directory Structure\*\*
+- Create dedicated `tests/` root directory
+- Create `tests/api/` for API endpoint tests
+- Prepare test file templates matching Laravel/Pest style approach
+- Configure .gitignore to exclude test artifacts
 
-- [x] Validate Core Test Workflow**  
-- Verify test database isolation with sample test  
-- Confirm sequential test execution prevents conflicts  
-- Test error handling in failed API scenarios  
-- Validate environment variable isolation  
+- [x] Implement Laravel/Pest Style Testing Approach\*\*
+- Create real database testing without mocks
+- Implement actual HTTP requests to API endpoints
+- Set up database isolation with clean state between tests
+- Build reusable test utilities for common operations
 
-- [x] Document Testing Conventions**  
-- Define naming standards for test files  
-- Establish Laravel/Pest style patterns for test organization  
-- Document database reset procedures  
-- Create contribution guidelines for new tests  
+- [x] Validate Core Test Workflow\*\*
+- Verify test database isolation with sample test
+- Confirm sequential test execution prevents conflicts
+- Test error handling in failed API scenarios
+- Validate environment variable isolation
 
-- [x] Integrate with Development Workflow**  
-- Configure ESLint rules for test files  
-- Add Prettier support for test code formatting  
-- Set up automated test script for easy execution  
-- Verify compatibility with existing development workflow  
+- [x] Document Testing Conventions\*\*
+- Define naming standards for test files
+- Establish Laravel/Pest style patterns for test organization
+- Document database reset procedures
+- Create contribution guidelines for new tests
 
-- [x] Create Baseline Test Suite**  
-- Write tests for authentication endpoints (login, registration)  
-- Implement user management API endpoint tests  
-- Add validation for role-based access control  
+- [x] Integrate with Development Workflow\*\*
+- Configure ESLint rules for test files
+- Add Prettier support for test code formatting
+- Set up automated test script for easy execution
+- Verify compatibility with existing development workflow
+
+- [x] Create Baseline Test Suite\*\*
+- Write tests for authentication endpoints (login, registration)
+- Implement user management API endpoint tests
+- Add validation for role-based access control
 - Create comprehensive test coverage for core authentication flows
-
-- [x] Add Menu for ACL in sidebar
-- it will have two sub menus Users, Roles
-- create a starter page for Roles submenu
-
-
 
 ## Week 2: User Management & Role-Based Access
 
@@ -169,31 +165,43 @@ This document outlines a week-by-week development plan for building the Inventor
 
 ### Tasks:
 
-- [ ] Extend user schema with role field
-  - Add role field with enum values (admin, cashier)
-  - Set default role for new users
-  - Add validation for role values
-- [ ] Implement create user API endpoint (admin only)
-  - Create /api/users POST route
-  - Add admin authorization check
-  - Implement password generation or temporary password
-  - Send welcome/credentials to new user (optional)
-- [ ] Implement update user API endpoint (admin only)
-  - Create /api/users/[id] PUT route
-  - Allow role, name, and active status updates
-  - Add admin authorization check
-- [ ] Implement deactivate user API endpoint (admin only)
-  - Create /api/users/[id] DELETE route (soft delete)
-  - Add admin authorization check
-  - Update user active status instead of removing
-- [ ] Create user management dashboard UI (admin only)
-  - Design user listing table
-  - Add create/edit user forms
-  - Implement user search and filtering
-  - Add activate/deactivate controls
+- [x] Add Menu for ACL in sidebar
+  - it will have two sub menus Users, Roles
+  - create a starter page for Roles submenu
 
-### ✅ **Task: Implement Dynamic Role-Permission System**  
-*Goal: Replace current static role-based system with dynamic permission-based system following Spatie Laravel approach*
+- [x] Integrate and implement role management index page
+  - update role page and render existing roles
+  - implement search function for roles in the page
+
+- [x] Integrate and implement role management create page
+  - crete page for role create
+  - ui will be like /docs/add-role.png
+
+- [x] Integrate and implement role management delete role
+  - action are as text now, use icon button for edit, delete
+  - integrate delete role with confirmation modal/dialogue
+
+- [x] Integrate and implement user management index page
+  - update user page and render existing users
+  - implement search function for user in the page
+
+- [x] Integrate and implement user management create page
+  - crete page for user create
+  - integrate user create
+
+- [x] Integrate and implement user management delete user
+  - integrate delete user with confirmation modal/dialogue
+
+- [ ] Active & Inactive for user and role
+  - create api endpoint if not implemented
+  - Add create/edit user forms
+  - in user and role index page add new column status
+  - use toggle component from shadcn to active and inactive resource
+  - integrate active inactive feature in ui
+
+### ✅ **Task: Implement Dynamic Role-Permission System**
+
+_Goal: Replace current static role-based system with dynamic permission-based system following Spatie Laravel approach_
 
 - [x] **Design Permission-Based System Architecture**
   - Define dynamic permissions model (view, add, update, delete, etc. for each feature)
@@ -224,14 +232,14 @@ This document outlines a week-by-week development plan for building the Inventor
   - Create role cloning functionality for easier setup
   - write tests
 
-- [ ] **Replace Current Role-Based Middleware**
+- [x] **Replace Current Role-Based Middleware**
   - Remove static role checking middleware
   - Create permission-based middleware for route protection
   - Implement permission checking functions (hasPermission, hasAnyPermission, hasAllPermissions)
   - Add wildcard permission support for flexible permission checking
   - Create middleware for both API routes and frontend route protection
 
-- [ ] **Update User Authentication Flow**
+- [x] **Update User Authentication Flow**
   - Modify login to fetch user permissions along with role
   - Update JWT token to include permissions
   - Implement permission caching for performance

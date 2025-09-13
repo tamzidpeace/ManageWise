@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const filter: any = {};
     
     // Only show active users
-    filter.isActive = true;
+    // filter.isActive = true;
     
     if (search) {
       filter.$or = [
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       return handleZodError(validation.error);
     }
     
-    const { name, email, password, roles } = validation.data;
+    const { name, email, password, roles, isActive } = validation.data;
     
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -117,6 +117,7 @@ export async function POST(request: NextRequest) {
       email,
       passwordHash: hashedPassword,
       roles: roles || [],
+      isActive: isActive !== undefined ? isActive : true, // Default to true if not provided
     });
     
     // Return success response (without password hash)
