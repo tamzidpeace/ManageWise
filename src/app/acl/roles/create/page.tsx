@@ -191,7 +191,7 @@ export default function CreateRolePage() {
             <textarea
               id="description"
               rows={3}
-              className="w-full rounded-md border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
