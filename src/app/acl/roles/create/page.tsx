@@ -19,6 +19,7 @@ export default function CreateRolePage() {
   const [description, setDescription] = useState('');
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+  const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -82,6 +83,7 @@ export default function CreateRolePage() {
         body: JSON.stringify({
           name,
           description,
+          isActive,
         }),
       });
 
@@ -193,6 +195,27 @@ export default function CreateRolePage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+          </div>
+
+          <div className="mb-4">
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Status
+            </label>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="isActive"
+                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-50"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+              />
+              <label
+                htmlFor="isActive"
+                className="ml-2 block text-sm text-gray-900"
+              >
+                Active
+              </label>
+            </div>
           </div>
 
           <div className="mb-6">

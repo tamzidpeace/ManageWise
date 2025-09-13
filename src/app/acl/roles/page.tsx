@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
-import { FiEdit, FiTrash2 } from 'react-icons/fi';
+import { Toggle } from '@/components/ui/toggle';
+import { FiEdit, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
 import {
   Dialog,
   DialogContent,
@@ -28,6 +29,7 @@ interface Role {
   name: string;
   description: string;
   permissions: Permission[];
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -55,6 +57,7 @@ export default function RolesPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [toggling, setToggling] = useState<{[key: string]: boolean}>({});
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -168,6 +171,44 @@ export default function RolesPage() {
     setRoleToDelete(null);
   };
 
+  const handleToggleStatus = async (role: Role) => {
+    try {
+      // Set loading state for this role
+      setToggling(prev => ({ ...prev, [role._id]: true }));
+      
+      const response = await fetch('/api/roles', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          id: role._id,
+          isActive: !role.isActive,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Refresh the roles list
+        fetchRoles(pagination.page, searchTerm);
+      } else {
+        setError(data.message || 'Failed to update role status');
+      }
+    } catch (err) {
+      setError('An error occurred while updating the role status');
+      console.error('Error updating role status:', err);
+    } finally {
+      // Remove loading state for this role
+      setToggling(prev => {
+        const newState = { ...prev };
+        delete newState[role._id];
+        return newState;
+      });
+    }
+  };
+
   // Don't render the page if the user is not authenticated
   if (!isAuthenticated) {
     return (
@@ -252,6 +293,12 @@ export default function RolesPage() {
                       </th>
                       <th
                         scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                      >
+                        Status
+                      </th>
+                      <th
+                        scope="col"
                         className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500"
                       >
                         Actions
@@ -279,6 +326,23 @@ export default function RolesPage() {
                         </td>
                         <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                           {new Date(role.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="whitespace-nowrap px-6 py-4">
+                          <Toggle
+                            aria-label="Toggle role status"
+                            pressed={role.isActive}
+                            onPressedChange={() => handleToggleStatus(role)}
+                            disabled={toggling[role._id]}
+                            className="h-8 w-8"
+                          >
+                            {toggling[role._id] ? (
+                              <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-current"></div>
+                            ) : role.isActive ? (
+                              <FiCheck className="h-4 w-4" />
+                            ) : (
+                              <FiX className="h-4 w-4" />
+                            )}
+                          </Toggle>
                         </td>
                         <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                           <div className="flex items-center justify-end space-x-2">

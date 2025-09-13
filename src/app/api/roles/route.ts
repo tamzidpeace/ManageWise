@@ -11,12 +11,14 @@ import { Permissions } from '@/schemas/permissions';
 const RoleCreateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),
+  isActive: z.boolean().optional(),
 });
 
 // Schema for updating role
 const RoleUpdateSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters').optional(),
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),
+  isActive: z.boolean().optional(),
 });
 
 // Schema for assigning permissions to role
@@ -65,7 +67,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         success: true,
-        roles,
+        roles: roles.map(role => ({
+          ...role.toObject(),
+          isActive: role.isActive
+        })),
         pagination: {
           page,
           limit,
@@ -101,7 +106,7 @@ export async function POST(request: NextRequest) {
       return handleZodError(validation.error);
     }
     
-    const { name, description } = validation.data;
+    const { name, description, isActive } = validation.data;
     
     // Check if role with this name already exists
     const existingRole = await Role.findOne({ name });
@@ -116,6 +121,7 @@ export async function POST(request: NextRequest) {
     const role = new Role({
       name,
       description,
+      isActive: isActive !== undefined ? isActive : true, // Default to true if not provided
     });
     
     await role.save();
@@ -132,6 +138,7 @@ export async function POST(request: NextRequest) {
           name: role.name,
           description: role.description,
           permissions: role.permissions,
+          isActive: role.isActive,
           createdAt: role.createdAt,
           updatedAt: role.updatedAt,
         }
@@ -164,7 +171,7 @@ export async function PUT(request: NextRequest) {
       return handleZodError(validation.error);
     }
     
-    const { id, name, description } = body;
+    const { id, name, description, isActive } = body;
     
     // Check if role exists
     const role = await Role.findById(id);
@@ -189,6 +196,7 @@ export async function PUT(request: NextRequest) {
     // Update role fields
     if (name !== undefined) role.name = name;
     if (description !== undefined) role.description = description;
+    if (isActive !== undefined) role.isActive = isActive;
     
     await role.save();
     
@@ -204,6 +212,7 @@ export async function PUT(request: NextRequest) {
           name: role.name,
           description: role.description,
           permissions: role.permissions,
+          isActive: role.isActive,
           createdAt: role.createdAt,
           updatedAt: role.updatedAt,
         }
@@ -316,6 +325,7 @@ export async function PATCH(request: NextRequest) {
           name: role.name,
           description: role.description,
           permissions: role.permissions,
+          isActive: role.isActive,
           createdAt: role.createdAt,
           updatedAt: role.updatedAt,
         }

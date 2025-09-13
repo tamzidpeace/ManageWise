@@ -6,6 +6,7 @@ export const UserRegistrationSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   roles: z.array(z.string()).optional(),
+  isActive: z.boolean().optional(),
 });
 
 export const UserLoginSchema = z.object({
@@ -53,7 +54,7 @@ export const OrderCreateSchema = z.object({
     productId: z.string(),
     quantity: z.number().int().min(1, 'Quantity must be at least 1'),
   })).min(1, 'Order must have at least one item'),
-  paymentMethod: z.enum(['cash', 'card'], 'Payment method must be either cash or card'),
+  paymentMethod: z.enum(['cash', 'card']),
   discountAmount: z.number().min(0, 'Discount amount must be a non-negative number').optional(),
 });
 

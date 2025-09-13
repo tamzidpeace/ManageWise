@@ -18,6 +18,7 @@ interface Role {
   name: string;
   description: string;
   permissions: Permission[];
+  isActive: boolean;
 }
 
 export default function EditRolePage({ params }: { params: { id: string } }) {
@@ -27,6 +28,7 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
   const [description, setDescription] = useState('');
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+  const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +69,7 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
       // Set role data
       setName(roleData.role.name);
       setDescription(roleData.role.description);
+      setIsActive(roleData.role.isActive);
       setSelectedPermissions(roleData.role.permissions.map((p: Permission) => p._id));
 
       // Fetch all permissions
@@ -120,6 +123,7 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
           id: params.id,
           name,
           description,
+          isActive,
         }),
       });
 
@@ -236,6 +240,27 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
+            </div>
+
+            <div className="mb-4">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Status
+              </label>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-50"
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
+                />
+                <label
+                  htmlFor="isActive"
+                  className="ml-2 block text-sm text-gray-900"
+                >
+                  Active
+                </label>
+              </div>
             </div>
 
             <div className="mb-6">

@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
-import { FiArrowLeft } from 'react-icons/fi';
+import { Toggle } from '@/components/ui/toggle';
+import { FiArrowLeft, FiCheck, FiX } from 'react-icons/fi';
 
 interface Role {
   _id: string;
@@ -21,6 +22,7 @@ export default function CreateUserPage() {
  const [confirmPassword, setConfirmPassword] = useState('');
   const [roles, setRoles] = useState<Role[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -92,6 +94,7 @@ export default function CreateUserPage() {
           email,
           password,
           roles: selectedRoles,
+          isActive,
         }),
       });
 
@@ -216,6 +219,25 @@ export default function CreateUserPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
+          </div>
+
+          <div className="mb-4">
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Status
+            </label>
+            <div className="flex items-center">
+              <Toggle
+                aria-label="Toggle user status"
+                pressed={isActive}
+                onPressedChange={setIsActive}
+                className="h-8 w-8"
+              >
+                {isActive ? <FiCheck className="h-4 w-4" /> : <FiX className="h-4 w-4" />}
+              </Toggle>
+              <span className="ml-2 text-sm text-gray-900">
+                {isActive ? 'Active' : 'Inactive'}
+              </span>
+            </div>
           </div>
 
           <div className="mb-6">

@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
-import { FiArrowLeft } from 'react-icons/fi';
+import { Toggle } from '@/components/ui/toggle';
+import { FiArrowLeft, FiCheck, FiX } from 'react-icons/fi';
 
 interface Role {
   _id: string;
@@ -224,19 +225,17 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
                 Status
               </label>
               <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  checked={isActive}
-                  onChange={(e) => setIsActive(e.target.checked)}
-                />
-                <label
-                  htmlFor="isActive"
-                  className="ml-2 block text-sm text-gray-900"
+                <Toggle
+                  aria-label="Toggle user status"
+                  pressed={isActive}
+                  onPressedChange={setIsActive}
+                  className="h-8 w-8"
                 >
-                  Active
-                </label>
+                  {isActive ? <FiCheck className="h-4 w-4" /> : <FiX className="h-4 w-4" />}
+                </Toggle>
+                <span className="ml-2 text-sm text-gray-900">
+                  {isActive ? 'Active' : 'Inactive'}
+                </span>
               </div>
             </div>
 

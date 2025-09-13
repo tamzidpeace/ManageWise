@@ -24,12 +24,13 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     
     return NextResponse.json(
       { 
-        success: true, 
+        success: true,
         role: {
           id: role._id,
           name: role.name,
           description: role.description,
           permissions: role.permissions,
+          isActive: role.isActive,
           createdAt: role.createdAt,
           updatedAt: role.updatedAt,
         }
