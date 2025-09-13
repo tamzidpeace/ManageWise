@@ -127,7 +127,7 @@ export default function RolesPage() {
     <div className="p-6">
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold text-gray-800">Role Management</h1>
-        <Button onClick={() => console.log('Create new role')}>
+        <Button onClick={() => router.push('/acl/roles/create')}>
           Create Role
         </Button>
       </div>
