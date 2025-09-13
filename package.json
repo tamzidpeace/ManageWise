@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "node ./scripts/run-seeder.js",
+    "seed": "MONGODB_URI=mongodb://localhost:27017/inventory-pos npx tsx src/scripts/run-seeder.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
