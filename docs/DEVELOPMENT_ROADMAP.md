@@ -153,6 +153,11 @@ This document outlines a week-by-week development plan for building the Inventor
 - Add validation for role-based access control  
 - Create comprehensive test coverage for core authentication flows
 
+- [x] Add Menu for ACL in sidebar
+- it will have two sub menus Users, Roles
+- create a starter page for Roles submenu
+
+
 
 ## Week 2: User Management & Role-Based Access
 
