@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,7 @@ export default function RolesPage() {
     total: 0,
     pages: 0,
   });
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -91,9 +92,20 @@ export default function RolesPage() {
     [pagination.limit]
   );
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchRoles(1, searchTerm);
+  // eslint-disable-next-line no-unused-vars
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    // Clear existing timeout
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    // Set new timeout
+    debounceTimeout.current = setTimeout(() => {
+      fetchRoles(1, value);
+    }, 500); // 500ms debounce delay
   };
 
   const handlePageChange = (newPage: number) => {
@@ -120,18 +132,15 @@ export default function RolesPage() {
         </Button>
       </div>
 
-      {/* Search Form */}
+      {/* Search Input */}
       <div className="mb-6">
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Search roles..."
-            className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Button type="submit">Search</Button>
-        </form>
+        <input
+          type="text"
+          placeholder="Search roles..."
+          className="flex-1 rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
       </div>
 
       {/* Error Message */}
