@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       user: {
         id: user.userId,
         email: user.email,
-        role: user.role,
+        role: user.roles,
       }
     },
     { status: 200 }

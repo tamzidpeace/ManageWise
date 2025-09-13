@@ -6,6 +6,7 @@ import { comparePasswords } from '@/utils/password';
 import jwt from 'jsonwebtoken';
 import { UserLoginSchema } from '@/schemas';
 import { handleZodError } from '@/utils/validation';
+import Permission from '@/models/Permission';
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,9 +25,10 @@ export async function POST(request: NextRequest) {
     // Find user by email and populate roles with permissions
     const user = await User.findOne({ email }).populate({
       path: 'roles',
+      model: Role,
       populate: {
         path: 'permissions',
-        model: 'Permission'
+        model: Permission
       }
     });
 
