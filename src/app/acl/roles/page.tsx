@@ -4,6 +4,15 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
+import { FiEdit, FiTrash2 } from 'react-icons/fi';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
 interface Permission {
   _id: string;
@@ -43,6 +52,9 @@ export default function RolesPage() {
     total: 0,
     pages: 0,
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -112,6 +124,48 @@ export default function RolesPage() {
     if (newPage >= 1 && newPage <= pagination.pages) {
       fetchRoles(newPage, searchTerm);
     }
+  };
+
+  const handleDeleteRole = async () => {
+    if (!roleToDelete) return;
+
+    try {
+      setDeleting(true);
+      const response = await fetch('/api/roles', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id: roleToDelete._id }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Refresh the roles list
+        fetchRoles(pagination.page, searchTerm);
+        setDeleteDialogOpen(false);
+        setRoleToDelete(null);
+      } else {
+        setError(data.message || 'Failed to delete role');
+      }
+    } catch (err) {
+      setError('An error occurred while deleting the role');
+      console.error('Error deleting role:', err);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const openDeleteDialog = (role: Role) => {
+    setRoleToDelete(role);
+    setDeleteDialogOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setRoleToDelete(null);
   };
 
   // Don't render the page if the user is not authenticated
@@ -227,18 +281,26 @@ export default function RolesPage() {
                           {new Date(role.createdAt).toLocaleDateString()}
                         </td>
                         <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                          <button
-                            onClick={() => console.log('Edit role', role._id)}
-                            className="mr-4 text-indigo-600 hover:text-indigo-900"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => console.log('Delete role', role._id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            Delete
-                          </button>
+                          <div className="flex items-center justify-end space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => router.push(`/acl/roles/${role._id}/edit`)}
+                              className="h-8 w-8"
+                            >
+                              <FiEdit className="h-4 w-4" />
+                              <span className="sr-only">Edit role</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => openDeleteDialog(role)}
+                              className="h-8 w-8 text-red-600 hover:text-red-900"
+                            >
+                              <FiTrash2 className="h-4 w-4" />
+                              <span className="sr-only">Delete role</span>
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -272,6 +334,34 @@ export default function RolesPage() {
               </div>
             </div>
           )}
+
+          {/* Delete Confirmation Dialog */}
+          <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to delete the role "{roleToDelete?.name}"? This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={closeDeleteDialog}
+                  disabled={deleting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleDeleteRole}
+                  disabled={deleting}
+                >
+                  {deleting ? 'Deleting...' : 'Delete'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </>
       )}
     </div>

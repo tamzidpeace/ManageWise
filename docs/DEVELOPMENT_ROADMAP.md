@@ -165,6 +165,10 @@ This document outlines a week-by-week development plan for building the Inventor
 - crete page for role create
 - ui will be like /docs/add-role.png
 
+- [x] Integrate and implement role management delete role
+- action are as text now, use icon button for edit, delete
+- integrate delete role with confirmation modal/dialogue
+
 
 
 ## Week 2: User Management & Role-Based Access
