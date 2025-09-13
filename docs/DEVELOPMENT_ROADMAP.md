@@ -157,6 +157,10 @@ This document outlines a week-by-week development plan for building the Inventor
 - it will have two sub menus Users, Roles
 - create a starter page for Roles submenu
 
+- [ ] Integrate and implement role management index page
+- update role page and render existing roles
+- implement search function for roles in the page
+
 
 
 ## Week 2: User Management & Role-Based Access
