@@ -45,6 +45,7 @@ export const createAdminUser = async () => {
         name: 'admin',
         description: 'Administrator',
         permissions: permissions.map((p) => p._id),
+        isActive: true
       });
       console.log('Created admin role');
     } else {

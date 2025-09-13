@@ -1,5 +1,6 @@
+import { createAdminUser } from '@/database/admin-seeder';
 import { config } from 'dotenv';
-import { createAdminUser } from '@/utils/createAdminUser';
+
 
 // Load environment variables from .env.local
 config({ path: '.env.local' });

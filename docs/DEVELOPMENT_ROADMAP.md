@@ -192,7 +192,7 @@ _Goal: Establish a robust, isolated testing environment for API endpoints follow
 - [x] Integrate and implement user management delete user
   - integrate delete user with confirmation modal/dialogue
 
-- [ ] Active & Inactive for user and role
+- [x] Active & Inactive for user and role
   - create api endpoint if not implemented
   - Add create/edit user forms
   - in user and role index page add new column status
