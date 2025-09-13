@@ -169,6 +169,17 @@ This document outlines a week-by-week development plan for building the Inventor
 - action are as text now, use icon button for edit, delete
 - integrate delete role with confirmation modal/dialogue
 
+- [x] Integrate and implement user management index page
+- update user page and render existing users
+- implement search function for user in the page
+
+- [x] Integrate and implement user management create page
+- crete page for user create
+- integrate user create
+
+- [x] Integrate and implement user management delete user
+- integrate delete user with confirmation modal/dialogue
+
 
 
 ## Week 2: User Management & Role-Based Access
