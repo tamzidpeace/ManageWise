@@ -128,7 +128,7 @@ export default function CreateUserPage() {
   if (!isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-90"></div>
+        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
       </div>
     );
   }
