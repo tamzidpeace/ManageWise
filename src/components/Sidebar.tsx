@@ -10,7 +10,6 @@ import {
   FiList,
   FiAward,
   FiShoppingCart,
-  FiUsers,
   FiBarChart2,
   FiLogOut,
   FiChevronLeft,
@@ -149,11 +148,11 @@ export default function Sidebar() {
     },
     {
       name: 'ACL',
-      href: '/acl',
+      href: '/acl/users',
       icon: FiShield,
       subItems: [
-        { name: 'Users', href: '/users' },
-        { name: 'Roles', href: '/roles' },
+        { name: 'Users', href: '/acl/users' },
+        { name: 'Roles', href: '/acl/roles' },
       ],
     },
     {
