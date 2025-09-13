@@ -17,6 +17,7 @@ import {
   FiChevronRight,
   FiChevronDown,
   FiChevronUp,
+  FiShield,
 } from 'react-icons/fi';
 import {
   Dialog,
@@ -147,10 +148,13 @@ export default function Sidebar() {
       ],
     },
     {
-      name: 'Users',
-      href: '/users',
-      icon: FiUsers,
-      subItems: [],
+      name: 'ACL',
+      href: '/acl',
+      icon: FiShield,
+      subItems: [
+        { name: 'Users', href: '/users' },
+        { name: 'Roles', href: '/roles' },
+      ],
     },
     {
       name: 'Reports',
@@ -163,21 +167,6 @@ export default function Sidebar() {
     },
   ];
 
-  // Get the appropriate menu item based on user role
-  const getFilteredMenuItems = () => {
-    if (user?.role === 'admin') {
-      return menuItems;
-    } else if (user?.role === 'cashier') {
-      // Filter out admin-only items for cashier
-      return menuItems.filter(
-        (item) => item.name !== 'Users' && item.name !== 'Reports'
-      );
-    }
-    return [];
-  };
-
-  const filteredMenuItems = getFilteredMenuItems();
-
   return (
     <>
       <div className={cn(
@@ -189,7 +178,7 @@ export default function Sidebar() {
           {!isSidebarCollapsed && <h1 className="text-xl font-bold">Inventory POS</h1>}
           <button 
             onClick={toggleSidebar}
-            className="p-2 rounded-md hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-md hover:bg-gray-700 transition-colors cursor-pointer"
             aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {isSidebarCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
@@ -199,7 +188,7 @@ export default function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto mt-4">
           <ul>
-            {filteredMenuItems.map((item) => {
+            {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
               const isMenuOpen = openMenus[item.name];
@@ -275,7 +264,7 @@ export default function Sidebar() {
           <button
             onClick={handleLogoutClick}
             className={cn(
-              "flex items-center justify-center w-full rounded-md bg-red-600 px-4 py-2 transition-colors hover:bg-red-700",
+              "flex items-center justify-center w-full cursor-pointer rounded-md bg-red-600 px-4 py-2 transition-colors hover:bg-red-700",
               isSidebarCollapsed ? "px-2 py-3" : ""
             )}
           >
