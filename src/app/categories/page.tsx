@@ -14,6 +14,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/useToast';
 
 interface Category {
   id: string;
@@ -34,9 +35,9 @@ interface Pagination {
 export default function CategoriesPage() {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
+  const { toast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
@@ -65,7 +66,6 @@ export default function CategoriesPage() {
     async (page: number = 1, search: string = '') => {
       try {
         setLoading(true);
-        setError(null);
 
         const queryParams = new URLSearchParams({
           page: page.toString(),
@@ -90,16 +90,24 @@ export default function CategoriesPage() {
             pages: 1
           });
         } else {
-          setError(data.message || 'Failed to fetch categories');
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: data.message || 'Failed to fetch categories',
+          });
         }
       } catch (err) {
-        setError('An error occurred while fetching categories');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'An error occurred while fetching categories',
+        });
         console.error('Error fetching categories:', err);
       } finally {
         setLoading(false);
       }
     },
-    [pagination.limit, token]
+    [pagination.limit, token, toast]
   );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,10 +152,18 @@ export default function CategoriesPage() {
         setDeleteDialogOpen(false);
         setCategoryToDelete(null);
       } else {
-        setError(data.message || 'Failed to delete category');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to delete category',
+        });
       }
     } catch (err) {
-      setError('An error occurred while deleting the category');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while deleting the category',
+      });
       console.error('Error deleting category:', err);
     } finally {
       setDeleting(false);
@@ -184,12 +200,25 @@ export default function CategoriesPage() {
 
       if (data.success) {
         // Refresh the categories list
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'Category status updated successfully',
+        });
         fetchCategories(pagination.page, searchTerm);
       } else {
-        setError(data.message || 'Failed to update category status');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to update category status',
+        });
       }
     } catch (err) {
-      setError('An error occurred while updating the category status');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while updating the category status',
+      });
       console.error('Error updating category status:', err);
     } finally {
       // Remove loading state for this category
@@ -229,13 +258,6 @@ export default function CategoriesPage() {
           onChange={handleSearchChange}
         />
       </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 rounded border border-red-400 bg-red-10 px-4 py-3 text-red-700">
-          {error}
-        </div>
-      )}
 
       {/* Loading State */}
       {loading ? (

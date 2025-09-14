@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { FiArrowLeft } from 'react-icons/fi';
+import { useToast } from '@/hooks/useToast';
 
 interface Permission {
   _id: string;
@@ -25,6 +26,7 @@ interface Role {
 export default function EditRolePage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
+  const { toast } = useToast();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [permissions, setPermissions] = useState<Permission[]>([]);
@@ -32,8 +34,6 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
   const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -49,7 +49,6 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
   const fetchRoleAndPermissions = async () => {
     try {
       setLoading(true);
-      setError(null);
 
       // Fetch role details
       const roleResponse = await fetch(`/api/roles/${params.id}`, {
@@ -62,7 +61,11 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
       const roleData = await roleResponse.json();
 
       if (!roleData.success) {
-        setError(roleData.message || 'Failed to fetch role');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: roleData.message || 'Failed to fetch role',
+        });
         setLoading(false);
         return;
       }
@@ -86,10 +89,18 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
       if (permissionsData.success) {
         setPermissions(permissionsData.permissions);
       } else {
-        setError(permissionsData.message || 'Failed to fetch permissions');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: permissionsData.message || 'Failed to fetch permissions',
+        });
       }
     } catch (err) {
-      setError('An error occurred while fetching role and permissions');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while fetching role and permissions',
+      });
       console.error('Error fetching role and permissions:', err);
     } finally {
       setLoading(false);
@@ -109,8 +120,6 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       // First, update the role details
@@ -131,7 +140,11 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
       const roleData = await roleResponse.json();
 
       if (!roleData.success) {
-        setError(roleData.message || 'Failed to update role');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: roleData.message || 'Failed to update role',
+        });
         setSaving(false);
         return;
       }
@@ -152,19 +165,31 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
       const permissionsData = await permissionsResponse.json();
 
       if (!permissionsData.success) {
-        setError(permissionsData.message || 'Role updated but failed to update permissions');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: permissionsData.message || 'Role updated but failed to update permissions',
+        });
         setSaving(false);
         return;
       }
 
-      setSuccess('Role updated successfully');
+      toast({
+        variant: 'success',
+        title: 'Success',
+        description: 'Role updated successfully',
+      });
       
       // Redirect to roles page after a short delay
       setTimeout(() => {
         router.push('/acl/roles');
       }, 1500);
     } catch (err) {
-      setError('An error occurred while updating the role');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while updating the role',
+      });
       console.error('Error updating role:', err);
     } finally {
       setSaving(false);
@@ -193,20 +218,6 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
           Back to Roles
         </Button>
       </div>
-
-      {/* Success Message */}
-      {success && (
-        <div className="mb-6 rounded border border-green-400 bg-green-100 px-4 py-3 text-green-700">
-          {success}
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-          {error}
-        </div>
-      )}
 
       {/* Loading State */}
       {loading ? (

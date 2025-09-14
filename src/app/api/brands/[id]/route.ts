@@ -20,7 +20,7 @@ export async function GET(
       }
       
       await dbConnect();
-      const { id } = params;
+      const { id } = await params;
   
       if (!id) {
         return NextResponse.json(
@@ -60,7 +60,7 @@ export async function PUT(
   
     try {
       await dbConnect();
-      const { id } = params;
+      const { id } = await params;
   
       if (!id) {
         return NextResponse.json(
@@ -133,7 +133,7 @@ export async function DELETE(
   
     try {
       await dbConnect();
-      const { id } = params;
+      const { id } = await params;
   
       if (!id) {
         return NextResponse.json(
