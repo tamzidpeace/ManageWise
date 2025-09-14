@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { FiArrowLeft } from 'react-icons/fi';
 
 interface Permission {
@@ -247,12 +248,10 @@ export default function EditRolePage({ params }: { params: { id: string } }) {
                 Status
               </label>
               <div className="flex items-center">
-                <input
-                  type="checkbox"
+                <Switch
                   id="isActive"
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-50"
                   checked={isActive}
-                  onChange={(e) => setIsActive(e.target.checked)}
+                  onCheckedChange={setIsActive}
                 />
                 <label
                   htmlFor="isActive"

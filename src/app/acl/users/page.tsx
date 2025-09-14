@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
-import { Toggle } from '@/components/ui/toggle';
-import { FiEdit, FiTrash2, FiUserPlus, FiUserCheck, FiCheck, FiX } from 'react-icons/fi';
+import { Switch } from '@/components/ui/switch';
+import { FiEdit, FiTrash2, FiUserPlus, FiUserCheck } from 'react-icons/fi';
 import {
   Dialog,
   DialogContent,
@@ -350,21 +350,12 @@ export default function UsersPage() {
                           </div>
                         </td>
                         <td className="whitespace-nowrap px-6 py-4">
-                          <Toggle
+                          <Switch
                             aria-label="Toggle user status"
-                            pressed={user.isActive}
-                            onPressedChange={() => handleToggleStatus(user)}
+                            checked={user.isActive}
+                            onCheckedChange={() => handleToggleStatus(user)}
                             disabled={activating[user._id]}
-                            className="h-8 w-8"
-                          >
-                            {activating[user._id] ? (
-                              <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-current"></div>
-                            ) : user.isActive ? (
-                              <FiCheck className="h-4 w-4" />
-                            ) : (
-                              <FiX className="h-4 w-4" />
-                            )}
-                          </Toggle>
+                          />
                         </td>
                         <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                           {new Date(user.createdAt).toLocaleDateString()}

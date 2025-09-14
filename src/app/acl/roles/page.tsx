@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
-import { Toggle } from '@/components/ui/toggle';
+import { Switch } from '@/components/ui/switch';
 import { FiEdit, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
 import {
   Dialog,
@@ -328,21 +328,12 @@ export default function RolesPage() {
                           {new Date(role.createdAt).toLocaleDateString()}
                         </td>
                         <td className="whitespace-nowrap px-6 py-4">
-                          <Toggle
+                          <Switch
                             aria-label="Toggle role status"
-                            pressed={role.isActive}
-                            onPressedChange={() => handleToggleStatus(role)}
+                            checked={role.isActive}
+                            onCheckedChange={() => handleToggleStatus(role)}
                             disabled={toggling[role._id]}
-                            className="h-8 w-8"
-                          >
-                            {toggling[role._id] ? (
-                              <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-current"></div>
-                            ) : role.isActive ? (
-                              <FiCheck className="h-4 w-4" />
-                            ) : (
-                              <FiX className="h-4 w-4" />
-                            )}
-                          </Toggle>
+                          />
                         </td>
                         <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                           <div className="flex items-center justify-end space-x-2">

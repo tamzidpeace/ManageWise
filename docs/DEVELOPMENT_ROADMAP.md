@@ -199,6 +199,19 @@ _Goal: Establish a robust, isolated testing environment for API endpoints follow
   - use toggle component from shadcn to active and inactive resource
   - integrate active inactive feature in ui
 
+### ✅ **Task: Implement Brand, Category Management**
+
+Goal: Create brand and category management features
+
+- [x] **Replace toggle with switch component for status of user**
+  - Now toggle is used for active/inactive user. use switch component from shadcn for active/inactive user
+  - After successfully implementing switch component, remove toggle component
+
+- [x] **Replace toggle with switch component for status of role**
+  - Now toggle is role for active/inactive user. use switch component from shadcn for active/inactive role
+  - After successfully implementing switch component, remove toggle component
+
+
 ### ✅ **Task: Implement Dynamic Role-Permission System**
 
 _Goal: Replace current static role-based system with dynamic permission-based system following Spatie Laravel approach_
