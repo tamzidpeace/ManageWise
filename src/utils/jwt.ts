@@ -2,8 +2,7 @@ import jwt from 'jsonwebtoken';
 import { NextRequest } from 'next/server';
 
 export interface JwtPayload {
-  userId: string;
-  email: string;
+  id: string;
   roles: string[];
   permissions: string[];
   iat: number;
@@ -37,4 +36,8 @@ export function getTokenFromRequest(request: NextRequest): string | null {
   }
   
   return authHeader.substring(7); // Remove 'Bearer ' prefix
+}
+
+export function generateToken(payload: object): string {
+    return jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: '1d' });
 }

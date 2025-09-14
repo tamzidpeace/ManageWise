@@ -69,7 +69,35 @@ export async function GET(request: NextRequest) {
   try {
     await dbConnect();
     
-    const brands = await Brand.find({ isActive: true }).sort({ name: 1 });
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search') || '';
+    
+    // Build query
+    const query: any = {};
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
+    }
+    
+    // Calculate skip for pagination
+    const skip = (page - 1) * limit;
+    
+    // Fetch brands with pagination
+    const brands = await Brand.find(query)
+      .sort({ name: 1 })
+      .skip(skip)
+      .limit(limit);
+      
+    // Get total count for pagination
+    const total = await Brand.countDocuments(query);
+    
+    const pagination = {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+    };
     
     return NextResponse.json(
       { 
@@ -78,7 +106,10 @@ export async function GET(request: NextRequest) {
           id: brand._id,
           name: brand.name,
           description: brand.description,
-        }))
+          isActive: brand.isActive,
+          createdAt: brand.createdAt,
+        })),
+        pagination
       },
       { status: 200 }
     );
