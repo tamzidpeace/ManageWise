@@ -1,15 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Brand from '@/models/Brand';
-import { withAuth, withRole } from '@/lib/authMiddleware';
+import { withPermission } from '@/lib/authMiddleware';
 import { BrandUpdateSchema } from '@/schemas';
 import { handleZodError } from '@/utils/validation';
+import { Permissions } from '@/schemas/permissions';
 
 export async function GET(
     request: NextRequest,
     { params }: { params: { id: string } }
   ) {
     try {
+      // Only users with BRANDS_VIEW permission can view brands
+      const authResult = await withPermission(request, Permissions.BRANDS_VIEW);
+      
+      // If withPermission returned a response, it means authentication or authorization failed
+      if (authResult instanceof NextResponse) {
+        return authResult;
+      }
+      
       await dbConnect();
       const { id } = params;
   
@@ -38,12 +47,13 @@ export async function GET(
       );
     }
 }
-  
+
 export async function PUT(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    const authResult = await withRole(request, ['admin']);
+    // Only users with BRANDS_UPDATE permission can update brands
+    const authResult = await withPermission(request, Permissions.BRANDS_UPDATE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -110,12 +120,13 @@ export async function PUT(
       );
     }
 }
-  
+
 export async function DELETE(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    const authResult = await withRole(request, ['admin']);
+    // Only users with BRANDS_DELETE permission can delete brands
+    const authResult = await withPermission(request, Permissions.BRANDS_DELETE);
     if (authResult instanceof NextResponse) {
       return authResult;
     }

@@ -18,4 +18,10 @@ export enum Permissions {
   PERMISSIONS_CREATE = 'permissions.create',
   PERMISSIONS_UPDATE = 'permissions.update',
   PERMISSIONS_DELETE = 'permissions.delete',
+
+  // Brand Permissions
+  BRANDS_VIEW = 'brands.view',
+  BRANDS_CREATE = 'brands.create',
+  BRANDS_UPDATE = 'brands.update',
+  BRANDS_DELETE = 'brands.delete',
 }

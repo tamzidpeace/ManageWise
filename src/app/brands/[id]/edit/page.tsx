@@ -12,7 +12,7 @@ interface Brand {
   description?: string;
   isActive: boolean;
   createdAt: string;
- updatedAt: string;
+  updatedAt: string;
 }
 
 export default function EditBrandPage({ params }: { params: { id: string } }) {
@@ -128,14 +128,14 @@ export default function EditBrandPage({ params }: { params: { id: string } }) {
 
       {/* Success Message */}
       {success && (
-        <div className="mb-6 rounded border border-green-400 bg-green-100 px-4 py-3 text-green-700">
+        <div className="mb-6 rounded border-green-400 bg-green-100 px-4 py-3 text-green-700">
           {success}
         </div>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="mb-6 rounded border border-red-400 bg-red-10 px-4 py-3 text-red-700">
+        <div className="mb-6 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
           {error}
         </div>
       )}

@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Brand from '@/models/Brand';
-import { withRole } from '@/lib/authMiddleware';
+import { withPermission } from '@/lib/authMiddleware';
 import { BrandCreateSchema } from '@/schemas';
 import { handleZodError } from '@/utils/validation';
+import { Permissions } from '@/schemas/permissions';
 
 export async function POST(request: NextRequest) {
   try {
-    // Only admin can create brands
-    const authResult = await withRole(request, ['admin']);
+    // Only users with BRANDS_CREATE permission can create brands
+    const authResult = await withPermission(request, Permissions.BRANDS_CREATE);
     
-    // If withRole returned a response, it means authentication or authorization failed
+    // If withPermission returned a response, it means authentication or authorization failed
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -67,6 +68,14 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    // Only users with BRANDS_VIEW permission can view brands
+    const authResult = await withPermission(request, Permissions.BRANDS_VIEW);
+    
+    // If withPermission returned a response, it means authentication or authorization failed
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    
     await dbConnect();
     
     const { searchParams } = new URL(request.url);

@@ -21,7 +21,7 @@ interface Brand {
   description?: string;
   isActive: boolean;
   createdAt: string;
-  updatedAt: string;
+ updatedAt: string;
 }
 
 interface Pagination {
@@ -35,7 +35,7 @@ export default function BrandsPage() {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
   const [brands, setBrands] = useState<Brand[]>([]);
- const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [pagination, setPagination] = useState<Pagination>({
