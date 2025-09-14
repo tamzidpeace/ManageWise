@@ -1,45 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Category from '@/models/Category';
-import { withRole } from '@/lib/authMiddleware';
+import { withPermission } from '@/lib/authMiddleware';
 import { CategoryCreateSchema } from '@/schemas';
 import { handleZodError } from '@/utils/validation';
+import { Permissions } from '@/schemas/permissions';
 
 export async function POST(request: NextRequest) {
   try {
+    // Only users with CATEGORIES_CREATE permission can create categories
+    const authResult = await withPermission(request, Permissions.CATEGORIES_CREATE);
     
-    // Parse the request body first
-    const body = await request.json();
-    console.log('Request body:', body);
-    
-    // Only admin can create categories
-    const authResult = await withRole(request, ['admin']);
-    
-    // If withRole returned a response, it means authentication or authorization failed
+    // If withPermission returned a response, it means authentication or authorization failed
     if (authResult instanceof NextResponse) {
-      console.log('Authentication or authorization failed');
       return authResult;
     }
     
-    console.log('Authenticated user, connecting to database');
     await dbConnect();
-    console.log('Connected to database');
+    
+    const body = await request.json();
     
     // Validate request body with Zod
     const validation = CategoryCreateSchema.safeParse(body);
     if (!validation.success) {
-      console.log('Validation failed:', validation.error);
       return handleZodError(validation.error);
     }
     
     const { name, description } = validation.data;
-    console.log('Validated data:', { name, description });
     
     // Check if category already exists
-    console.log('Checking if category already exists');
     const existingCategory = await Category.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
-    console.log('Existing category check result:', existingCategory);
-    
     if (existingCategory) {
       return NextResponse.json(
         { success: false, message: 'Category with this name already exists' },
@@ -48,12 +38,10 @@ export async function POST(request: NextRequest) {
     }
     
     // Create category
-    console.log('Creating category');
     const category = await Category.create({
       name,
       description,
     });
-    console.log('Category created:', category);
     
     return NextResponse.json(
       { 
@@ -80,9 +68,45 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    // Only users with CATEGORIES_VIEW permission can view categories
+    const authResult = await withPermission(request, Permissions.CATEGORIES_VIEW);
+    
+    // If withPermission returned a response, it means authentication or authorization failed
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    
     await dbConnect();
     
-    const categories = await Category.find({ isActive: true }).sort({ name: 1 });
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search') || '';
+    
+    // Build query
+    const query: any = {};
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
+    }
+    
+    // Calculate skip for pagination
+    const skip = (page - 1) * limit;
+    
+    // Fetch categories with pagination
+    const categories = await Category.find(query)
+      .sort({ name: 1 })
+      .skip(skip)
+      .limit(limit);
+      
+    // Get total count for pagination
+    const total = await Category.countDocuments(query);
+    
+    const pagination = {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+    };
     
     return NextResponse.json(
       { 
@@ -91,7 +115,10 @@ export async function GET(request: NextRequest) {
           id: category._id,
           name: category.name,
           description: category.description,
-        }))
+          isActive: category.isActive,
+          createdAt: category.createdAt,
+        })),
+        pagination
       },
       { status: 200 }
     );
