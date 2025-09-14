@@ -59,10 +59,4 @@ const ProductSchema: Schema = new Schema(
   }
 );
 
-// Add indexes
-ProductSchema.index({ name: 'text' });
-ProductSchema.index({ category: 1 });
-ProductSchema.index({ brand: 1 });
-ProductSchema.index({ stock: 1 });
-
 export default mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);

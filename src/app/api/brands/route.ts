@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Brand from '@/models/Brand';
-import { withRole } from '@/lib/authMiddleware';
+import { withPermission } from '@/lib/authMiddleware';
 import { BrandCreateSchema } from '@/schemas';
 import { handleZodError } from '@/utils/validation';
+import { Permissions } from '@/schemas/permissions';
 
 export async function POST(request: NextRequest) {
   try {
-    // Only admin can create brands
-    const authResult = await withRole(request, ['admin']);
+    // Only users with BRANDS_CREATE permission can create brands
+    const authResult = await withPermission(request, Permissions.BRANDS_CREATE);
     
-    // If withRole returned a response, it means authentication or authorization failed
+    // If withPermission returned a response, it means authentication or authorization failed
     if (authResult instanceof NextResponse) {
       return authResult;
     }
@@ -67,9 +68,45 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    // Only users with BRANDS_VIEW permission can view brands
+    const authResult = await withPermission(request, Permissions.BRANDS_VIEW);
+    
+    // If withPermission returned a response, it means authentication or authorization failed
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    
     await dbConnect();
     
-    const brands = await Brand.find({ isActive: true }).sort({ name: 1 });
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search') || '';
+    
+    // Build query
+    const query: any = {};
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
+    }
+    
+    // Calculate skip for pagination
+    const skip = (page - 1) * limit;
+    
+    // Fetch brands with pagination
+    const brands = await Brand.find(query)
+      .sort({ name: 1 })
+      .skip(skip)
+      .limit(limit);
+      
+    // Get total count for pagination
+    const total = await Brand.countDocuments(query);
+    
+    const pagination = {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+    };
     
     return NextResponse.json(
       { 
@@ -78,7 +115,10 @@ export async function GET(request: NextRequest) {
           id: brand._id,
           name: brand.name,
           description: brand.description,
-        }))
+          isActive: brand.isActive,
+          createdAt: brand.createdAt,
+        })),
+        pagination
       },
       { status: 200 }
     );

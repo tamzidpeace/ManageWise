@@ -211,6 +211,14 @@ Goal: Create brand and category management features
   - Now toggle is role for active/inactive user. use switch component from shadcn for active/inactive role
   - After successfully implementing switch component, remove toggle component
 
+- [x] Brand Management Backend & Test cases
+  - Create API endpoints for brand management
+  - Create test cases for brand management
+
+- [x] Brand Management UI & Integration
+  - Update UI for brand management(index, create, update and delete)
+  - Integrate UI for brand management
+
 
 ### ✅ **Task: Implement Dynamic Role-Permission System**
 
