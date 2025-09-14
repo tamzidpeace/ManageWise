@@ -76,13 +76,17 @@ export const createAdminUser = async () => {
 };
 
 // Run the seeder and properly close the connection
-createAdminUser().then(() => {
-  console.log('Admin user setup completed');
-  // Close the mongoose connection to allow the process to exit
-  mongoose.connection.close();
-}).catch((error) => {
-  console.error('Error setting up admin user:', error);
-  // Close the mongoose connection even if there was an error
-  mongoose.connection.close();
-  process.exit(1);
-});
+if (require.main === module) {
+  createAdminUser().then(() => {
+    console.log('Admin user setup completed');
+    // Close the mongoose connection to allow the process to exit
+    mongoose.connection.close();
+  }).catch((error) => {
+    console.error('Error setting up admin user:', error);
+    // Close the mongoose connection even if there was an error
+    mongoose.connection.close();
+    process.exit(1);
+  });
+}
+
+export default createAdminUser;

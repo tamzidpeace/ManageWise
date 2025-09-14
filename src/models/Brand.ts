@@ -35,7 +35,5 @@ const BrandSchema: Schema = new Schema(
   }
 );
 
-// Add indexes
-BrandSchema.index({ name: 1 });
 
 export default mongoose.models.Brand || mongoose.model<IBrand>('Brand', BrandSchema);

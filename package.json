@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "MONGODB_URI=mongodb://localhost:27017/inventory-pos npx tsx src/scripts/run-seeder.ts",
+    "seed:permissions": "MONGODB_URI=mongodb://localhost:27017/inventory-pos npx tsx src/scripts/run-permission-seeder.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
