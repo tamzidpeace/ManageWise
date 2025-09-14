@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { FiArrowLeft, FiCheck, FiX } from 'react-icons/fi';
+import { useToast } from '@/hooks/useToast';
 
 interface Role {
   _id: string;
@@ -24,6 +25,7 @@ interface User {
 export default function EditUserPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
+  const { toast } = useToast();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [roles, setRoles] = useState<Role[]>([]);
@@ -31,8 +33,6 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
   const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -48,7 +48,6 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
   const fetchUserAndRoles = async () => {
     try {
       setLoading(true);
-      setError(null);
 
       // Fetch user details
       const userResponse = await fetch(`/api/users/${params.id}`, {
@@ -61,7 +60,11 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
       const userData = await userResponse.json();
 
       if (!userData.success) {
-        setError(userData.message || 'Failed to fetch user');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: userData.message || 'Failed to fetch user',
+        });
         setLoading(false);
         return;
       }
@@ -85,10 +88,18 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
       if (rolesData.success) {
         setRoles(rolesData.roles);
       } else {
-        setError(rolesData.message || 'Failed to fetch roles');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: rolesData.message || 'Failed to fetch roles',
+        });
       }
     } catch (err) {
-      setError('An error occurred while fetching user and roles');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while fetching user and roles',
+      });
       console.error('Error fetching user and roles:', err);
     } finally {
       setLoading(false);
@@ -108,8 +119,6 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       // Update the user details
@@ -130,17 +139,29 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
       const data = await response.json();
 
       if (data.success) {
-        setSuccess('User updated successfully');
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'User updated successfully',
+        });
         
         // Redirect to users page after a short delay
         setTimeout(() => {
           router.push('/acl/users');
         }, 1500);
       } else {
-        setError(data.message || 'Failed to update user');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to update user',
+        });
       }
     } catch (err) {
-      setError('An error occurred while updating the user');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while updating the user',
+      });
       console.error('Error updating user:', err);
     } finally {
       setSaving(false);
@@ -169,20 +190,6 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
           Back to Users
         </Button>
       </div>
-
-      {/* Success Message */}
-      {success && (
-        <div className="mb-6 rounded border-green-400 bg-green-100 px-4 py-3 text-green-700">
-          {success}
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-          {error}
-        </div>
-      )}
 
       {/* Loading State */}
       {loading ? (

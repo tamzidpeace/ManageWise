@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { FiArrowLeft, FiCheck, FiX } from 'react-icons/fi';
+import { FiArrowLeft } from 'react-icons/fi';
+import { useToast } from '@/hooks/useToast';
 
 interface Role {
   _id: string;
@@ -16,16 +17,15 @@ interface Role {
 export default function CreateUserPage() {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
+  const { toast } = useToast();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
- const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [roles, setRoles] = useState<Role[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -51,10 +51,18 @@ export default function CreateUserPage() {
       if (data.success) {
         setRoles(data.roles);
       } else {
-        setError(data.message || 'Failed to fetch roles');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to fetch roles',
+        });
       }
     } catch (err) {
-      setError('An error occurred while fetching roles');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while fetching roles',
+      });
       console.error('Error fetching roles:', err);
     }
   };
@@ -74,13 +82,15 @@ export default function CreateUserPage() {
     
     // Validate passwords match
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Passwords do not match',
+      });
       return;
     }
     
     setLoading(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       const response = await fetch('/api/users', {
@@ -101,7 +111,11 @@ export default function CreateUserPage() {
       const data = await response.json();
 
       if (data.success) {
-        setSuccess('User created successfully');
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'User created successfully',
+        });
         // Reset form
         setName('');
         setEmail('');
@@ -114,10 +128,18 @@ export default function CreateUserPage() {
           router.push('/acl/users');
         }, 1500);
       } else {
-        setError(data.message || 'Failed to create user');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to create user',
+        });
       }
     } catch (err) {
-      setError('An error occurred while creating the user');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while creating the user',
+      });
       console.error('Error creating user:', err);
     } finally {
       setLoading(false);
@@ -146,20 +168,6 @@ export default function CreateUserPage() {
           Back to Users
         </Button>
       </div>
-
-      {/* Success Message */}
-      {success && (
-        <div className="mb-6 rounded border border-green-400 bg-green-100 px-4 py-3 text-green-700">
-          {success}
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-          {error}
-        </div>
-      )}
 
       <div className="rounded-lg bg-white p-6 shadow">
         <form onSubmit={handleSubmit}>

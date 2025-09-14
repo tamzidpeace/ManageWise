@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import LayoutItems from './LayoutItems';
+import { ToastProvider, ToastViewport } from '@/components/ui/toast';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'Inventory POS System',
@@ -15,7 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <LayoutItems children={children} />
+        <ToastProvider>
+          <LayoutItems children={children} />
+          <Toaster />
+          <ToastViewport />
+        </ToastProvider>
       </body>
     </html>
   );

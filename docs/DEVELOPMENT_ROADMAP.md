@@ -219,11 +219,11 @@ Goal: Create brand and category management features
   - Update UI for brand management(index, create, update and delete)
   - Integrate UI for brand management
 
-- [ ] Category Management Backend & Test cases
+- [x] Category Management Backend & Test cases
   - Create API endpoints for category management
   - Create test cases for category management
 
-- [ ] Category Management UI & Integration
+- [x] Category Management UI & Integration
   - Update UI for category management(index, create, update and delete)
   - Integrate UI for category management
 

@@ -14,6 +14,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/useToast';
 
 interface Role {
   _id: string;
@@ -41,9 +42,9 @@ interface Pagination {
 export default function UsersPage() {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
+  const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
@@ -72,7 +73,6 @@ export default function UsersPage() {
     async (page: number = 1, search: string = '') => {
       try {
         setLoading(true);
-        setError(null);
 
         const queryParams = new URLSearchParams({
           page: page.toString(),
@@ -92,16 +92,24 @@ export default function UsersPage() {
           setUsers(data.users);
           setPagination(data.pagination);
         } else {
-          setError(data.message || 'Failed to fetch users');
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: data.message || 'Failed to fetch users',
+          });
         }
       } catch (err) {
-        setError('An error occurred while fetching users');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'An error occurred while fetching users',
+        });
         console.error('Error fetching users:', err);
       } finally {
         setLoading(false);
       }
     },
-    [pagination.limit, token]
+    [pagination.limit, token, toast]
   );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,15 +149,28 @@ export default function UsersPage() {
       const data = await response.json();
 
       if (data.success) {
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'User deactivated successfully',
+        });
         // Refresh the users list
         fetchUsers(pagination.page, searchTerm);
         setDeleteDialogOpen(false);
         setUserToDelete(null);
       } else {
-        setError(data.message || 'Failed to delete user');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to delete user',
+        });
       }
     } catch (err) {
-      setError('An error occurred while deleting the user');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while deleting the user',
+      });
       console.error('Error deleting user:', err);
     } finally {
       setDeleting(false);
@@ -172,13 +193,26 @@ export default function UsersPage() {
       const data = await response.json();
 
       if (data.success) {
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'User activated successfully',
+        });
         // Refresh the users list
         fetchUsers(pagination.page, searchTerm);
       } else {
-        setError(data.message || 'Failed to activate user');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to activate user',
+        });
       }
     } catch (err) {
-      setError('An error occurred while activating the user');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while activating the user',
+      });
       console.error('Error activating user:', err);
     } finally {
       // Remove loading state for this user
@@ -216,13 +250,26 @@ export default function UsersPage() {
       const data = await response.json();
 
       if (data.success) {
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: `User ${user.isActive ? 'deactivated' : 'activated'} successfully`,
+        });
         // Refresh the users list
         fetchUsers(pagination.page, searchTerm);
       } else {
-        setError(data.message || 'Failed to update user status');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to update user status',
+        });
       }
     } catch (err) {
-      setError('An error occurred while updating the user status');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while updating the user status',
+      });
       console.error('Error updating user status:', err);
     } finally {
       // Remove loading state for this user
@@ -247,10 +294,15 @@ export default function UsersPage() {
     <div className="p-6">
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
-        <Button onClick={() => router.push('/acl/users/create')} className="flex items-center gap-2">
-          <FiUserPlus className="h-4 w-4" />
-          Create User
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => router.push('/acl/users/toast-demo')} variant="outline">
+            Toast Demo
+          </Button>
+          <Button onClick={() => router.push('/acl/users/create')} className="flex items-center gap-2">
+            <FiUserPlus className="h-4 w-4" />
+            Create User
+          </Button>
+        </div>
       </div>
 
       {/* Search Input */}
@@ -263,13 +315,6 @@ export default function UsersPage() {
           onChange={handleSearchChange}
         />
       </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-          {error}
-        </div>
-      )}
 
       {/* Loading State */}
       {loading ? (
