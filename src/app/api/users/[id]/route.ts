@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     await dbConnect();
     
     // Find user by ID and populate roles
-    const user = await User.findById(params.id).populate('roles');
+    const user = await User.findById((await params).id).populate('roles');
     if (!user) {
       return NextResponse.json(
         { success: false, message: 'User not found' },
@@ -77,7 +77,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const { name, email, roles, isActive } = validation.data;
     
     // Find user by ID
-    const user = await User.findById(params.id);
+    const user = await User.findById((await params).id);
     if (!user) {
       return NextResponse.json(
         { success: false, message: 'User not found' },
@@ -144,7 +144,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     await dbConnect();
     
     // Find user by ID
-    const user = await User.findById(params.id);
+    const user = await User.findById((await params).id);
     if (!user) {
       return NextResponse.json(
         { success: false, message: 'User not found' },
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     await dbConnect();
     
     // Find user by ID
-    const user = await User.findById(params.id);
+    const user = await User.findById((await params).id);
     if (!user) {
       return NextResponse.json(
         { success: false, message: 'User not found' },

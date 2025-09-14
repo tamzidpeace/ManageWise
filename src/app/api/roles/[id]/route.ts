@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     await dbConnect();
     
     // Find role by ID and populate permissions
-    const role = await Role.findById(params.id).populate('permissions');
+    const role = await Role.findById((await params).id).populate('permissions');
     if (!role) {
       return NextResponse.json(
         { success: false, message: 'Role not found' },

@@ -295,9 +295,6 @@ export default function UsersPage() {
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
         <div className="flex gap-2">
-          <Button onClick={() => router.push('/acl/users/toast-demo')} variant="outline">
-            Toast Demo
-          </Button>
           <Button onClick={() => router.push('/acl/users/create')} className="flex items-center gap-2">
             <FiUserPlus className="h-4 w-4" />
             Create User

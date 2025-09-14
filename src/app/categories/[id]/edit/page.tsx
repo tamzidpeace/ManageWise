@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { FiArrowLeft } from 'react-icons/fi';
+import { useToast } from '@/hooks/useToast';
 
 interface Category {
   id: string;
@@ -18,12 +19,11 @@ interface Category {
 export default function EditCategoryPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
+  const { toast } = useToast();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -39,7 +39,6 @@ export default function EditCategoryPage({ params }: { params: { id: string } })
   const fetchCategory = async () => {
     try {
       setLoading(true);
-      setError(null);
 
       const response = await fetch(`/api/categories/${params.id}`, {
         method: 'GET',
@@ -54,10 +53,18 @@ export default function EditCategoryPage({ params }: { params: { id: string } })
         setName(data.category.name);
         setDescription(data.category.description || '');
       } else {
-        setError(data.message || 'Failed to fetch category');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to fetch category',
+        });
       }
     } catch (err) {
-      setError('An error occurred while fetching category');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while fetching category',
+      });
       console.error('Error fetching category:', err);
     } finally {
       setLoading(false);
@@ -67,8 +74,6 @@ export default function EditCategoryPage({ params }: { params: { id: string } })
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       const response = await fetch(`/api/categories/${params.id}`, {
@@ -86,17 +91,29 @@ export default function EditCategoryPage({ params }: { params: { id: string } })
       const data = await response.json();
 
       if (data.success) {
-        setSuccess('Category updated successfully');
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'Category updated successfully',
+        });
         
         // Redirect to categories page after a short delay
         setTimeout(() => {
           router.push('/categories');
         }, 1500);
       } else {
-        setError(data.message || 'Failed to update category');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to update category',
+        });
       }
     } catch (err) {
-      setError('An error occurred while updating the category');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while updating the category',
+      });
       console.error('Error updating category:', err);
     } finally {
       setSaving(false);
@@ -125,20 +142,6 @@ export default function EditCategoryPage({ params }: { params: { id: string } })
           Back to Categories
         </Button>
       </div>
-
-      {/* Success Message */}
-      {success && (
-        <div className="mb-6 rounded border-green-400 bg-green-100 px-4 py-3 text-green-700">
-          {success}
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-          {error}
-        </div>
-      )}
 
       {/* Loading State */}
       {loading ? (

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/useToast';
 
 interface Permission {
   _id: string;
@@ -16,14 +17,13 @@ interface Permission {
 export default function CreateRolePage() {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
+  const { toast } = useToast();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -49,10 +49,18 @@ export default function CreateRolePage() {
       if (data.success) {
         setPermissions(data.permissions);
       } else {
-        setError(data.message || 'Failed to fetch permissions');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to fetch permissions',
+        });
       }
     } catch (err) {
-      setError('An error occurred while fetching permissions');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while fetching permissions',
+      });
       console.error('Error fetching permissions:', err);
     }
   };
@@ -70,8 +78,6 @@ export default function CreateRolePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       // First, create the role
@@ -91,7 +97,11 @@ export default function CreateRolePage() {
       const roleData = await roleResponse.json();
 
       if (!roleData.success) {
-        setError(roleData.message || 'Failed to create role');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: roleData.message || 'Failed to create role',
+        });
         setLoading(false);
         return;
       }
@@ -113,13 +123,21 @@ export default function CreateRolePage() {
         const assignData = await assignResponse.json();
 
         if (!assignData.success) {
-          setError(assignData.message || 'Role created but failed to assign permissions');
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: assignData.message || 'Role created but failed to assign permissions',
+          });
           setLoading(false);
           return;
         }
       }
 
-      setSuccess('Role created successfully');
+      toast({
+        variant: 'success',
+        title: 'Success',
+        description: 'Role created successfully',
+      });
       // Reset form
       setName('');
       setDescription('');
@@ -130,7 +148,11 @@ export default function CreateRolePage() {
         router.push('/acl/roles');
       }, 1500);
     } catch (err) {
-      setError('An error occurred while creating the role');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while creating the role',
+      });
       console.error('Error creating role:', err);
     } finally {
       setLoading(false);
@@ -154,20 +176,6 @@ export default function CreateRolePage() {
           Back to Roles
         </Button>
       </div>
-
-      {/* Success Message */}
-      {success && (
-        <div className="mb-6 rounded border border-green-400 bg-green-100 px-4 py-3 text-green-700">
-          {success}
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-          {error}
-        </div>
-      )}
 
       <div className="rounded-lg bg-white p-6 shadow">
         <form onSubmit={handleSubmit}>

@@ -14,6 +14,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/useToast';
 
 interface Brand {
   id: string;
@@ -21,7 +22,7 @@ interface Brand {
   description?: string;
   isActive: boolean;
   createdAt: string;
- updatedAt: string;
+  updatedAt: string;
 }
 
 interface Pagination {
@@ -34,9 +35,9 @@ interface Pagination {
 export default function BrandsPage() {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
+  const { toast } = useToast();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
@@ -47,7 +48,7 @@ export default function BrandsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [toggling, setToggling] = useState<{[key: string]: boolean}>({});
+  const [toggling, setToggling] = useState<{ [key: string]: boolean }>({});
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -65,7 +66,6 @@ export default function BrandsPage() {
     async (page: number = 1, search: string = '') => {
       try {
         setLoading(true);
-        setError(null);
 
         const queryParams = new URLSearchParams({
           page: page.toString(),
@@ -83,23 +83,33 @@ export default function BrandsPage() {
 
         if (data.success) {
           setBrands(data.brands);
-          setPagination(data.pagination || {
-            page,
-            limit: pagination.limit,
-            total: data.brands.length,
-            pages: 1
-          });
+          setPagination(
+            data.pagination || {
+              page,
+              limit: pagination.limit,
+              total: data.brands.length,
+              pages: 1,
+            }
+          );
         } else {
-          setError(data.message || 'Failed to fetch brands');
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: data.message || 'Failed to fetch brands',
+          });
         }
       } catch (err) {
-        setError('An error occurred while fetching brands');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'An error occurred while fetching brands',
+        });
         console.error('Error fetching brands:', err);
       } finally {
         setLoading(false);
       }
     },
-    [pagination.limit, token]
+    [pagination.limit, token, toast]
   );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,15 +149,28 @@ export default function BrandsPage() {
       const data = await response.json();
 
       if (data.success) {
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'Brand deleted successfully',
+        });
         // Refresh the brands list
         fetchBrands(pagination.page, searchTerm);
         setDeleteDialogOpen(false);
         setBrandToDelete(null);
       } else {
-        setError(data.message || 'Failed to delete brand');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to delete brand',
+        });
       }
     } catch (err) {
-      setError('An error occurred while deleting the brand');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while deleting the brand',
+      });
       console.error('Error deleting brand:', err);
     } finally {
       setDeleting(false);
@@ -167,8 +190,8 @@ export default function BrandsPage() {
   const handleToggleStatus = async (brand: Brand) => {
     try {
       // Set loading state for this brand
-      setToggling(prev => ({ ...prev, [brand.id]: true }));
-      
+      setToggling((prev) => ({ ...prev, [brand.id]: true }));
+
       const response = await fetch(`/api/brands/${brand.id}`, {
         method: 'PUT',
         headers: {
@@ -183,17 +206,30 @@ export default function BrandsPage() {
       const data = await response.json();
 
       if (data.success) {
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: `Brand ${brand.isActive ? 'deactivated' : 'activated'} successfully`,
+        });
         // Refresh the brands list
         fetchBrands(pagination.page, searchTerm);
       } else {
-        setError(data.message || 'Failed to update brand status');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to update brand status',
+        });
       }
     } catch (err) {
-      setError('An error occurred while updating the brand status');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while updating the brand status',
+      });
       console.error('Error updating brand status:', err);
     } finally {
       // Remove loading state for this brand
-      setToggling(prev => {
+      setToggling((prev) => {
         const newState = { ...prev };
         delete newState[brand.id];
         return newState;
@@ -229,13 +265,6 @@ export default function BrandsPage() {
           onChange={handleSearchChange}
         />
       </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-          {error}
-        </div>
-      )}
 
       {/* Loading State */}
       {loading ? (
@@ -320,7 +349,9 @@ export default function BrandsPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => router.push(`/brands/${brand.id}/edit`)}
+                              onClick={() =>
+                                router.push(`/brands/${brand.id}/edit`)
+                              }
                               className="h-8 w-8"
                             >
                               <FiEdit className="h-4 w-4" />
@@ -376,7 +407,8 @@ export default function BrandsPage() {
               <DialogHeader>
                 <DialogTitle>Confirm Deletion</DialogTitle>
                 <DialogDescription>
-                  Are you sure you want to delete the brand "{brandToDelete?.name}"? This action cannot be undone.
+                  Are you sure you want to delete the brand "
+                  {brandToDelete?.name}"? This action cannot be undone.
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>

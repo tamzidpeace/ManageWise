@@ -5,15 +5,15 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { FiArrowLeft } from 'react-icons/fi';
+import { useToast } from '@/hooks/useToast';
 
 export default function CreateCategoryPage() {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
+  const { toast } = useToast();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -26,8 +26,6 @@ export default function CreateCategoryPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       const response = await fetch('/api/categories', {
@@ -45,20 +43,32 @@ export default function CreateCategoryPage() {
       const data = await response.json();
 
       if (data.success) {
-        setSuccess('Category created successfully');
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'Category created successfully',
+        });
         // Reset form
         setName('');
         setDescription('');
-        
+
         // Redirect to categories page after a short delay
         setTimeout(() => {
           router.push('/categories');
         }, 1500);
       } else {
-        setError(data.message || 'Failed to create category');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to create category',
+        });
       }
     } catch (err) {
-      setError('An error occurred while creating the category');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while creating the category',
+      });
       console.error('Error creating category:', err);
     } finally {
       setLoading(false);
@@ -78,7 +88,7 @@ export default function CreateCategoryPage() {
     <div className="p-6">
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold text-gray-800">Create Category</h1>
-        <Button 
+        <Button
           onClick={() => router.push('/categories')}
           variant="outline"
           className="flex items-center gap-2"
@@ -88,24 +98,13 @@ export default function CreateCategoryPage() {
         </Button>
       </div>
 
-      {/* Success Message */}
-      {success && (
-        <div className="mb-6 rounded border-green-400 bg-green-100 px-4 py-3 text-green-700">
-          {success}
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-          {error}
-        </div>
-      )}
-
       <div className="rounded-lg bg-white p-6 shadow">
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="name"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               Category Name *
             </label>
             <input
@@ -119,7 +118,10 @@ export default function CreateCategoryPage() {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="description" className="mb-2 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="description"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               Description
             </label>
             <textarea

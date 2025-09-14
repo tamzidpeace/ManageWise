@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { FiEdit, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
+import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/useToast';
 
 interface Permission {
   _id: string;
@@ -44,9 +45,9 @@ interface Pagination {
 export default function RolesPage() {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
+  const { toast } = useToast();
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
@@ -75,7 +76,6 @@ export default function RolesPage() {
     async (page: number = 1, search: string = '') => {
       try {
         setLoading(true);
-        setError(null);
 
         const queryParams = new URLSearchParams({
           page: page.toString(),
@@ -95,16 +95,24 @@ export default function RolesPage() {
           setRoles(data.roles);
           setPagination(data.pagination);
         } else {
-          setError(data.message || 'Failed to fetch roles');
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: data.message || 'Failed to fetch roles',
+          });
         }
       } catch (err) {
-        setError('An error occurred while fetching roles');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'An error occurred while fetching roles',
+        });
         console.error('Error fetching roles:', err);
       } finally {
         setLoading(false);
       }
     },
-    [pagination.limit]
+    [pagination.limit, toast]
   );
 
   // eslint-disable-next-line no-unused-vars
@@ -146,15 +154,28 @@ export default function RolesPage() {
       const data = await response.json();
 
       if (data.success) {
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'Role deleted successfully',
+        });
         // Refresh the roles list
         fetchRoles(pagination.page, searchTerm);
         setDeleteDialogOpen(false);
         setRoleToDelete(null);
       } else {
-        setError(data.message || 'Failed to delete role');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to delete role',
+        });
       }
     } catch (err) {
-      setError('An error occurred while deleting the role');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while deleting the role',
+      });
       console.error('Error deleting role:', err);
     } finally {
       setDeleting(false);
@@ -191,13 +212,26 @@ export default function RolesPage() {
       const data = await response.json();
 
       if (data.success) {
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: `Role ${role.isActive ? 'deactivated' : 'activated'} successfully`,
+        });
         // Refresh the roles list
         fetchRoles(pagination.page, searchTerm);
       } else {
-        setError(data.message || 'Failed to update role status');
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: data.message || 'Failed to update role status',
+        });
       }
     } catch (err) {
-      setError('An error occurred while updating the role status');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while updating the role status',
+      });
       console.error('Error updating role status:', err);
     } finally {
       // Remove loading state for this role
@@ -237,13 +271,6 @@ export default function RolesPage() {
           onChange={handleSearchChange}
         />
       </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="mb-6 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
-          {error}
-        </div>
-      )}
 
       {/* Loading State */}
       {loading ? (
