@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useToast } from '@/hooks/useToast';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function CreateBrandPage() {
   const router = useRouter();
@@ -75,15 +76,11 @@ export default function CreateBrandPage() {
     }
   };
 
-  // Don't render the page if the user is not authenticated
-  if (!isAuthenticated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
-
+  
+    // Don't render the page if the user is not authenticated
+    if (!isAuthenticated) {
+      return <LoadingSpinner />;
+    }
   return (
     <div className="p-6">
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
