@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { Switch } from '@/components/ui/switch';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import {
@@ -239,11 +240,7 @@ export default function BrandsPage() {
 
   // Don't render the page if the user is not authenticated
   if (!isAuthenticated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (

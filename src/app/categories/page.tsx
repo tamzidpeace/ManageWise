@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/useToast';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface Category {
   id: string;
@@ -232,11 +233,7 @@ export default function CategoriesPage() {
 
   // Don't render the page if the user is not authenticated
   if (!isAuthenticated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
